@@ -1,0 +1,21 @@
+body {
+    background: linear-gradient(168deg, rgba(195, 109, 34, 1), rgba(253, 45, 137, 1) 57%);
+    height: 100vh;
+}
+
+.navbar-tasks {
+    background: transparent;
+}
+
+.task-btn-item {
+    text-align: left;
+    background-color: rgb(198, 132, 9);
+    border: none;
+}
+
+.modal-header {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+}
