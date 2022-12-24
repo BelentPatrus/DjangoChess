@@ -4,3 +4,4 @@ from django.db import models
 
 
 # class chessboard(models.Model):
+#     chessboardSetup = JSONField()
