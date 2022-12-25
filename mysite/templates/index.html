@@ -62,19 +62,80 @@
 
 
         var startGame = function(){
-            var arr = ["b_rook","b_horse","b_bishop","b_king","b_queen","b_bishop" ,"b_horse","b_rook",]
-            for (var i = 0; i < elements.length && i < arr.length; i++) {
 
-                var img = document.createElement("img"); 
-                img.src = "{% static 'img\pieces\w_rook.png' %}"; 
-              //  var src = document.getElementById("1-1"); 
+
+
+            var url = 'http://127.0.0.1:8000/chessengine/'
+
+            fetch(url)
+            .then((resp) => resp.json())
+            .then(function(data){
+                console.log('Data',data)
+                console.log(data[0].type)
                 
-            //    src.appendChild(img); 
-                elements[i].appendChild(img)
-            }
+                for (var i = 0; i < elements.length; i++) {
+                    
+                    var img = document.createElement("img"); 
+                    
+                    di = data[i]
+                    type = di.type
+                    if(type == "rook"){
+                        str = "{% static 'img\pieces\w_rook.png' %}"
+
+                        img.src = str; 
+                    }
+                    else if(type == "bishop"){
+                        str = "{% static 'img\pieces\w_bishop.png' %}"
+
+                        img.src = str; 
+                    }
+                    else if(type == "horse"){
+                        str = "{% static 'img\pieces\w_horse.png' %}"
+
+                        img.src = str; 
+                    }
+                    else if(type == "queen"){
+                        str = "{% static 'img\pieces\w_queen.png' %}"
+
+                        img.src = str; 
+                    }
+                    else if(type == "king"){
+                        str = "{% static 'img\pieces\w_king.png' %}"
+
+                        img.src = str; 
+                    }
+                    else if(type == "pawn"){
+                        str = "{% static 'img\pieces\w_pawn.png' %}"
+
+                        img.src = str; 
+                    }
+                    //  var src = document.getElementById("1-1"); 
+                    
+                    //    src.appendChild(img); 
+                    elements[i].appendChild(img)
+                }
+            })
         } 
         
         startGame();
+
+
+
+
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
         
 
 
