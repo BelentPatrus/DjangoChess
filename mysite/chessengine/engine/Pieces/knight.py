@@ -1,5 +1,5 @@
 
-from .Piece import Piece
+from .piece import Piece
 
 
 class Knight(Piece):

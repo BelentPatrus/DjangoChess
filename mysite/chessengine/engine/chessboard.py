@@ -1,12 +1,13 @@
 
 
-from .Pieces.Pawn import Pawn
-from .Pieces.Rook import Rook
-from .Pieces.King import King
-from .Pieces.Knight import Knight
-from .Pieces.Bishop import Bishop
-from .Pieces.Queen import Queen
-from .Pieces.Empty import Empty
+from .Pieces.rook import Rook
+from .Pieces.bishop import Bishop
+from .Pieces.queen import Queen
+from .Pieces.king import King
+from .Pieces.knight import Knight
+from .Pieces.pawn import Pawn
+from .Pieces.empty import Empty
+
 from .Pieces.Pieces import Pieces
 
 
