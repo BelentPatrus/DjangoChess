@@ -15,13 +15,14 @@ Including another URLconf
 """
 from . import views
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.contrib import staticfiles
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
+    path('chessengine/', include('chessengine.urls'))
 
 
 ]
