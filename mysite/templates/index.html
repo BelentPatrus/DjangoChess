@@ -71,48 +71,53 @@
             .then((resp) => resp.json())
             .then(function(data){
                 console.log('Data',data)
-                console.log(data[0].type)
-                
-                for (var i = 0; i < elements.length; i++) {
-                    
+                jsonData = JSON.parse(data.chessboardSetup)
+                console.log(jsonData)
+                for (var i = 0; i < 8; i++) {
+                  for (var j = 0; j < 8; j++) {
+
+
                     var img = document.createElement("img"); 
                     
-                    di = data[i]
-                    type = di.type
-                    if(type == "rook"){
+                    type = jsonData[i][j].type.toLowerCase();
+                    console.log("This is the type -- " + type);
+                    if(type.toLowerCase() == "rook"){
                         str = "{% static 'img\pieces\w_rook.png' %}"
 
                         img.src = str; 
                     }
-                    else if(type == "bishop"){
+                    else if(type.toLowerCase() == "bishop"){
                         str = "{% static 'img\pieces\w_bishop.png' %}"
 
                         img.src = str; 
                     }
-                    else if(type == "horse"){
+                    else if(type.toLowerCase() == "knight"){
                         str = "{% static 'img\pieces\w_horse.png' %}"
 
                         img.src = str; 
                     }
-                    else if(type == "queen"){
+                    else if(type.toLowerCase() == "queen"){
                         str = "{% static 'img\pieces\w_queen.png' %}"
 
                         img.src = str; 
                     }
-                    else if(type == "king"){
+                    else if(type.toLowerCase() == "king"){
                         str = "{% static 'img\pieces\w_king.png' %}"
 
                         img.src = str; 
                     }
-                    else if(type == "pawn"){
+                    else if(type.toLowerCase() == "pawn"){
                         str = "{% static 'img\pieces\w_pawn.png' %}"
 
                         img.src = str; 
                     }
                     //  var src = document.getElementById("1-1"); 
                     
-                    //    src.appendChild(img); 
-                    elements[i].appendChild(img)
+                    //    src.appendChild(img);
+                    correctIndex = i * 8 
+                    elements[correctIndex+j].appendChild(img)
+                  }
+
                 }
             })
         } 

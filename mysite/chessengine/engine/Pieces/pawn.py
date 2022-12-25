@@ -1,5 +1,10 @@
-import piece
-class Pawn(piece):
-    def validMove(self):
-        pass
+from .Piece import Piece
 
+
+class Pawn(Piece):
+
+    def __init__(self, team, type):
+        super().__init__(team, type)
+
+    def validMove(self):
+        return False
