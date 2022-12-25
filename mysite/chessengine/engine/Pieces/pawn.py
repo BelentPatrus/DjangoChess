@@ -1,5 +1,5 @@
-import piece
-class Pawn(piece):
+from Pieces import Piece
+class Pawn(Piece):
     def validMove(self):
         pass
 

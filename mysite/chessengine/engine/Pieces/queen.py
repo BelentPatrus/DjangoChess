@@ -1,4 +1,4 @@
-import piece
-class Queen(piece):
+from Pieces import Piece
+class Queen(Piece):
     def validMove(self):
         pass
