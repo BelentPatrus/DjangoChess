@@ -9,11 +9,13 @@ from .serializers import ChessboardSerializer
 
 @api_view(['GET'])
 def getData(request):
-    data = chessboard.objects.all()[0]
+    # data = chessboard.objects.all()[0]
+    data = [{"type": "rook", "color": "black"}, {"type": "horse", "color": "black"}, {"type": "bishop", "color": "black"}, {"type": "queen", "color": "black"}, {"type": "king", "color": "black"}, {"type": "bishop", "color": "black"}, {"type": "horse", "color": "black"}, {"type": "rook", "color": "black"}, {
+        "type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}, {"type": "pawn", "color": "black"}]
 
     # serializer = ChessboardSerializer(chessboard, many=False)
 
-    return Response(data.chessboardSetup)
+    return Response(data)
 
     # person = [
     #     {
