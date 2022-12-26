@@ -5,9 +5,9 @@ from .Pieces import Pieces
 
 class Piece(ABC, dict):
 
-    @abstractmethod
+    
     def __init__(self, team, type):
-
+        self.moves = []
         if type == Pieces.BISHOP:
             strType = "BISHOP"
         elif type == Pieces.PAWN:

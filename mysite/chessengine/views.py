@@ -20,7 +20,7 @@ def getData(request):
     taskdata = chessboard(chessboardSetup=result)
 
     taskdata.save()
-    data = chessboard.objects.all()[30]
+    data = chessboard.objects.all()[2]
     serializer = ChessboardSerializer(data, many=False)
 
     return Response(serializer.data)
