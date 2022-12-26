@@ -30,9 +30,9 @@ class Chessboard:
 
     def movePiece(self, move):
         """
-            Args: move dict with the current and next move location in two lists accessible with key's 'curr' and 'next'
+            args: move dict with the current and next move location in two lists accessible with key's 'curr' and 'next'
             returns: True or False based on if the move is in the moveset calculated to be in the piece's move list.
-            
+
         """
         moveInfo = json.loads(move)
         row, col = moveInfo['curr'][0], moveInfo['curr'][1]
