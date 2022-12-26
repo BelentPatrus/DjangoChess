@@ -7,7 +7,8 @@ class Piece(ABC, dict):
 
     
     def __init__(self, team, type):
-        self.moves = []
+        self.team = team
+        self.type = type
         if type == Pieces.BISHOP:
             strType = "BISHOP"
         elif type == Pieces.PAWN:
@@ -28,5 +29,5 @@ class Piece(ABC, dict):
         dict.__init__(self, team=team, type=strType)
 
     @abstractmethod
-    def validMove(self):
+    def validMoves(self):
         pass
