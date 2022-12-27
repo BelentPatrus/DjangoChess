@@ -30,4 +30,8 @@ class Piece(ABC, dict):
 
     @abstractmethod
     def validMoves(self):
+        """
+            args: The state of the board (2d array), the move that wants to be made (dictionary with field 'next' with move values).
+            return: list of moves that the piece can make each in a tuple (row, coloumn).
+        """
         pass
