@@ -110,3 +110,28 @@ class testChessMoves(TestCase):
         self.assertTrue(c.board[3][1] == r)
         print('Done moving rook test 3')
 
+    def testbishop(self):
+        c = cb('White','Black')
+        b = c.board[7][5]
+        pm = {
+            'curr':[6,4],
+            'next':[4,4]
+        }
+        
+        c.movePiece(pm)
+        self.assertTrue(c.board[7][5] == b)
+        bm = {
+            'curr':[7,5],
+            'next':[4,2]
+        }
+        c.movePiece(bm)
+        self.assertTrue(c.board[4][2] == b)
+
+        bm2 = {
+            'curr':[4,2],
+            'next':[1,5]
+        }
+        c.movePiece(bm2)
+        self.assertTrue(c.board[1][5] == b)
+        print('Done take bishop test')
+
