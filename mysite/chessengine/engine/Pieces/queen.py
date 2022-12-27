@@ -44,7 +44,7 @@ class Queen(Piece):
         
         i = 1
         # white: left, black: right
-        while col-i > 0 and board[row][col+i].team.lower() != pieceTeam:
+        while col-i >= 0 and board[row][col-i].team.lower() != pieceTeam:
             print('piece team: {}, board piece team: {}'.format(board[row][col-i].team.lower(), pieceTeam))
             print('valid Move r :{}'.format([row,col-i]))
             moves.append((row, col-i))
@@ -92,6 +92,5 @@ class Queen(Piece):
                 break
             i+=1
 
-        
         return moves
         

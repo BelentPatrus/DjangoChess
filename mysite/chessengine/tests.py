@@ -77,3 +77,36 @@ class testChessMoves(TestCase):
         }
         c.movePiece(wqm3)
         print('Done queen take test 4')
+    
+    def testrooktest(self):
+        c = cb('White','Black')
+        r = c.board[7][7]
+        wpm = {
+            'curr':[6,7],
+            'next':[4,7]
+        }
+        c.movePiece(wpm)
+        print('Done pawn move for rook test')
+        wrm = {
+            'curr':[7,7],
+            'next':[5,7]
+        }
+        c.movePiece(wrm)
+        self.assertTrue(c.board[5][7] == r)
+        print('Done moving Rook test 1')
+        wrm1 = {
+            'curr':[5,7],
+            'next':[5,1]
+        } 
+        c.movePiece(wrm1)
+        self.assertTrue(c.board[5][1] == r)
+        print('Done moving rook test 2')
+
+        wrm2 = {
+            'curr':[5,1],
+            'next':[3,1]
+        }
+        c.movePiece(wrm2)
+        self.assertTrue(c.board[3][1] == r)
+        print('Done moving rook test 3')
+
