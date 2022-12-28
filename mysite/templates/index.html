@@ -6,6 +6,7 @@
             <a class="navbar-brand" href="#">Navbar</a>
             <!-- Button trigger modal -->
             <button type="button"
+                    id="startgamebtn"
                     class="btn btn-large btn-success"
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal">
@@ -39,18 +40,8 @@
         {% endfor %}
     </div>
     <script type="text/javascript">
-        var chessboard = [
-            {
-                "type": "pawn",
-                "color": "black",
-            },
-            {
-                "type": "pawn",
-                "color": "white",
-            },
-        ]
-
         var elements = document.getElementsByClassName("chess-cell");
+        var startGameBtn = document.getElementById('startgamebtn');
 
         var myFunction = function(btn) {
             console.log(btn.currentTarget.id);
@@ -61,17 +52,19 @@
         }
 
 
+
+
         var startGame = function(){
 
 
 
-            var url = 'http://127.0.0.1:8000/chessengine/'
+            var url = 'http://127.0.0.1:8000/chessengine/getData/'
 
             fetch(url)
             .then((resp) => resp.json())
             .then(function(data){
                 console.log('Data',data)
-                jsonData = JSON.parse(data.chessboardSetup)
+                jsonData = JSON.parse(data.chessboard)
                 console.log(jsonData)
                 for (var i = 0; i < 8; i++) {
                   for (var j = 0; j < 8; j++) {
@@ -122,27 +115,14 @@
             })
         } 
         
-        startGame();
+        startGameBtn.addEventListener("click",startGame);
 
 
 
-
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-        
-
+        // move chess pieces
+        var moveChessPiece = function(){
+            return False
+        }
 
         
 
