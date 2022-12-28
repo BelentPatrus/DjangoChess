@@ -135,3 +135,36 @@ class testChessMoves(TestCase):
         self.assertTrue(c.board[1][5] == b)
         print('Done take bishop test')
 
+    def testking(self):
+        c = cb('White','Black')
+        k = c.board[7][4]
+        pm = {
+            'curr':[6,4],
+            'next':[4,4]
+        } 
+        c.movePiece(pm)
+        # up 1
+        km = {
+            'curr':[7,4],
+            'next':[6,4]
+        }
+        # up left 1
+        km2 = {
+            'curr':[6,4],
+            'next': [5,3]
+        }
+        # up 1
+        km3 = {
+            'curr':[5,3],
+            'next':[4,3]
+        }
+        # up right
+        km4={
+            'curr':[4,3],
+            'next':[3,4]
+        }
+        c.movePiece(km)
+        c.movePiece(km2)
+        c.movePiece(km3)
+        c.movePiece(km4)
+        self.assertTrue(c.board[3][4] == k)
