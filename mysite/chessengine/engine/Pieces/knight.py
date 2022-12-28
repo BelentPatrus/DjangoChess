@@ -35,5 +35,5 @@ class Knight(Piece):
         if row+1 < 8 and col+2 < 8 and board[row+1][col+2].team.lower() != pieceTeam:
             moves.append((row+1, col+2))
         
-        print('MOVESET GOTTEN AT POSITION [{},{}] : {}'.format(row,col,moves))
+        print('Moves available for KNIGHT at [{},{}]: {}'.format(row,col,moves))
         return moves

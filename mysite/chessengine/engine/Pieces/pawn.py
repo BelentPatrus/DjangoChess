@@ -33,5 +33,6 @@ class Pawn(Piece):
             if row+1 < 8 and col+1 < 8 and not isinstance(board[row+1][col+1], Empty):
                 moves.append((row-1, col+1))
 
+        print('Moves available for PAWN at [{},{}]: {}'.format(row,col,moves))
         return moves
         

@@ -36,16 +36,18 @@ class Chessboard:
         """
         # To test comment and make moveInfo = move
         moveInfo = json.loads(move)
+        #moveInfo = move
         row, col = moveInfo['curr'][0], moveInfo['curr'][1]
         moveSet = self.board[row][col].validMoves(self.board, moveInfo['curr'])
         isValid = tuple(moveInfo['next']) in moveSet
         if isValid:
-            print('Piece: \n{}, \nmoveInfo: \n{}'.format(self.board[row][col], moveInfo['next']))
+            #print('Piece: \n{}, \nmoveInfo: \n{}'.format(self.board[row][col], moveInfo['next']))
             self.moveLog.append(tuple([self.board[row][col], moveInfo['next']]))
             nextRow, nextCol = moveInfo['next'][0], moveInfo['next'][1] 
-            print('In valid if statement changing the pieces position to {},{}'.format(nextRow, nextCol))  
+            #print('In valid if statement changing the pieces position to {},{}'.format(nextRow, nextCol))  
             self.board[nextRow][nextCol] = self.board[row][col]
             self.board[row][col] = Empty("Empty", Pieces.EMPTY)
+            print('Made move to [{},{}]'.format(nextRow,nextCol))
         
         return isValid
         
