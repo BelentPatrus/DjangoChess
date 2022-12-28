@@ -168,3 +168,34 @@ class testChessMoves(TestCase):
         c.movePiece(km3)
         c.movePiece(km4)
         self.assertTrue(c.board[3][4] == k)
+
+    def testknight(self):
+        c = cb('White','Black')
+        k = c.board[7][6]
+        bk = c.board[0][1]
+        km = {
+            'curr':[7,6],
+            'next':[5,5]
+        }
+        km1 = {
+            'curr':[5,5],
+            'next': [4,3]
+        }
+        bkm = {
+            'curr':[0,1],
+            'next':[2,2]
+        }
+        bkm1 = {
+            'curr':[2,2],
+            'next':[4,3]
+        }
+        c.movePiece(km)
+        self.assertTrue(c.board[5][5] == k)
+        c.movePiece(km1)
+        self.assertTrue(c.board[4][3] == k)
+        c.movePiece(bkm)
+        self.assertTrue(c.board[2][2] == bk)
+        c.movePiece(bkm1)
+        self.assertTrue(c.board[4][3] == bk)
+        print(c.board[4])
+        

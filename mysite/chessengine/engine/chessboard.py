@@ -39,7 +39,6 @@ class Chessboard:
         row, col = moveInfo['curr'][0], moveInfo['curr'][1]
         moveSet = self.board[row][col].validMoves(self.board, moveInfo['curr'])
         isValid = tuple(moveInfo['next']) in moveSet
-        print(isValid)
         if isValid:
             print('Piece: \n{}, \nmoveInfo: \n{}'.format(self.board[row][col], moveInfo['next']))
             self.moveLog.append(tuple([self.board[row][col], moveInfo['next']]))
