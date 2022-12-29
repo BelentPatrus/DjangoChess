@@ -1,10 +1,11 @@
 
+from django.views.decorators.csrf import csrf_exempt
 from .engine.chessboard import Chessboard
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import ChessboardModel, GameStateModel
-from .serializers import ChessboardSerializer
+from .serializers import ChessboardSerializer, ChessBoardMoveSerializer
 import json
 
 # Create your views here.
@@ -27,8 +28,14 @@ def getData(request):
     return Response(serializer.data)
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
+@csrf_exempt
 def postData(request):
-    serializer = ChessboardSerializer(data=request.data)
+    serializer = ChessBoardMoveSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        print(request.data)
+        print("HHHHHHHHHHHHHHHHHHEYOOOOOOOOOOOOOOOOOOOOOOOO")
 
-    return Response()
+    return Response(serializer.data)

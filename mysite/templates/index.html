@@ -15,6 +15,7 @@
         </div>
     </nav>
     <div class="container-lg chessboard">
+
         {% for nums in range %}
             {% if forloop.counter|divisibleby:2 %}
                 <div class="row">
@@ -42,6 +43,37 @@
     <script type="text/javascript">
         var elements = document.getElementsByClassName("chess-cell");
         var startGameBtn = document.getElementById('startgamebtn');
+        userClicks = [];
+        gameStateId = -1;
+
+
+
+        document.addEventListener("click", function(event){
+            if(event.target.classList.contains('chess-cell')){
+                cellId = event.target.id.split("-");
+                cellId[0] = parseInt(cellId[0]);
+                cellId[1] = parseInt(cellId[1]);
+                if(userClicks.length == 1){
+                    //send move over for validation
+                    userClicks[1] = cellId;
+                    moveChessPiece(userClicks)
+                    console.log("send data");
+                    userClicks = []
+                }
+                else if(userClicks.length == 0){
+                    userClicks[0] = cellId;
+                }
+            }
+            else{
+                if(userClicks.length > 0){
+                    userClicks = [[]]
+                }
+                console.log("no")
+            }
+
+            console.log(userClicks)
+        })
+
 
         var myFunction = function(btn) {
             console.log(btn.currentTarget.id);
@@ -120,8 +152,34 @@
 
 
         // move chess pieces
-        var moveChessPiece = function(){
-            return False
+        var moveChessPiece = function(moveCords){
+            var url = 'http://127.0.0.1:8000/chessengine/postData/'
+            var token = "{{ csrf_token }}"
+
+            const obj = {
+
+                selectedPiece: JSON.stringify(moveCords[0]),
+                moveLocation: JSON.stringify(moveCords[1]),
+                gameState: 1
+            };
+
+            fetch(url,{
+                method: 'POST',
+                headers: {
+                    'Content-type':'application/json',
+                    'X-CSRFToken' : token,
+                },
+                body: JSON.stringify(
+                    
+                obj
+                
+                
+                ),
+            }).then(result => console.log('success====:', result))
+             .catch(error => console.log('error============:', error));
+
+             
+
         }
 
         
