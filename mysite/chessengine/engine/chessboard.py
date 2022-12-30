@@ -1,6 +1,7 @@
 
 import json
 
+
 from .Pieces.rook import Rook
 from .Pieces.bishop import Bishop
 from .Pieces.queen import Queen
@@ -11,9 +12,19 @@ from .Pieces.empty import Empty
 from .Pieces.Pieces import Pieces
 from .TeamSideE import TeamSideE
 from ..models import ChessboardModel
+from .Pieces.piece import Piece
 
 
 class Chessboard:
+
+    def __convert2D__(self, board):
+        result = []
+        row = 8
+        index = 0
+        while index < len(board):
+            result.append(board[index:index+row])
+            index = index + row
+        return result
 
     def __init__(self, chessBoardModel=None):
         if chessBoardModel == None:
@@ -34,7 +45,28 @@ class Chessboard:
             self.moveLog = []
             self.captureLog = []
         else:
-            self.board = chessBoardModel
+            self.board = []
+            for p in chessBoardModel:
+                if p['type'] == Pieces.BISHOP:
+                    tmp = Bishop(p['team'], Pieces.BISHOP)
+                elif p['type'] == Pieces.PAWN:
+                    tmp = Pawn(p['team'], Pieces.PAWN)
+                elif p['type'] == Pieces.QUEEN:
+                    tmp = Queen(p['team'], Pieces.QUEEN)
+                elif p['type'] == Pieces.KNIGHT:
+                    tmp = Knight(p['team'], Pieces.KNIGHT)
+                elif p['type'] == Pieces.KING:
+                    tmp = King(p['team'], Pieces.KING)
+                elif p['type'] == Pieces.EMPTY:
+                    tmp = Empty(p['team'], Pieces.EMPTY)
+                elif p['type'] == Pieces.ROOK:
+                    tmp = Rook(p['team'], Pieces.ROOK)
+                else:
+                    return
+                self.board.append(tmp)
+
+            self.board = self.__convert2D__(self.board)
+
             self.moveLog = []  # come back and fix this must query db
             self.captureLog = []  # come back and fix this must query db
 
@@ -49,6 +81,7 @@ class Chessboard:
         # moveInfo = move
         # row, col = moveInfo['curr'][0], moveInfo['curr'][1]
         row, col = cur[0], cur[1]
+        print(self.board[row][col])
         moveSet = self.board[row][col].validMoves(self.board, cur)
         isValid = tuple(next) in moveSet
         if isValid:
@@ -62,3 +95,13 @@ class Chessboard:
             print('Made move to [{},{}]'.format(nextRow, nextCol))
 
         return isValid
+
+    def getJSONDict(self):
+        # need to serialize the board
+        chessboardSerialized = []
+
+        for row in self.board:
+            for p in row:
+                chessboardSerialized.append(p.getJSONDict())
+
+        return chessboardSerialized

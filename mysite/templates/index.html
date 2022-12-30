@@ -15,7 +15,6 @@
         </div>
     </nav>
     <div class="container-lg chessboard">
-
         {% for nums in range %}
             {% if forloop.counter|divisibleby:2 %}
                 <div class="row">
@@ -43,13 +42,15 @@
     <script type="text/javascript">
         var elements = document.getElementsByClassName("chess-cell");
         var startGameBtn = document.getElementById('startgamebtn');
+        var chessboardFE = document.querySelector('.chessboard');
+
         userClicks = [];
         gameStateId = -1;
 
 
 
         document.addEventListener("click", function(event){
-            if(event.target.classList.contains('chess-cell')){
+            if(event.target.closest('.chess-cell')){
                 cellId = event.target.id.split("-");
                 cellId[0] = parseInt(cellId[0]);
                 cellId[1] = parseInt(cellId[1]);
@@ -66,7 +67,7 @@
             }
             else{
                 if(userClicks.length > 0){
-                    userClicks = [[]]
+                    userClicks = []
                 }
                 console.log("no")
             }
@@ -85,65 +86,98 @@
 
 
 
+        var renderBoard = function(){
+            var url = 'http://127.0.0.1:8000/chessengine/latestBoard/' + gameStateId;
+            fetch(url)
+            .then((resp) => resp.json())
+            .then(function(data){
+                processBoard(data, false)
+            })
+        }
+
+
+
+        var processBoard = function(data, freshBoardFlag=true){
+            if(freshBoardFlag){
+                jsonData = JSON.parse(data.chessboard);
+                gameStateId = JSON.parse(data.gameState);
+                console.log(gameStateId);
+                chessboardFE.setAttribute('id',gameStateId.toString());
+
+            }
+            else{
+                jsonData = data['chessboard'];
+                gameStateId = data['gameState'];
+                chessboardFE.setAttribute('id',gameStateId.toString());
+
+            }
+
+            for (var i = 0; i < 64; i++) {
+                let element = elements[i];
+                while (element.firstChild) {
+                    element.removeChild(element.firstChild);
+                }
+                var img = document.createElement("img"); 
+                    
+                type = jsonData[i].type.toLowerCase();
+                console.log("This is the type -- " + type);
+                if(type.toLowerCase() == "rook"){
+                str = "{% static 'img\pieces\w_rook.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+                }
+                else if(type.toLowerCase() == "bishop"){
+                    str = "{% static 'img\pieces\w_bishop.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+
+                }
+                else if(type.toLowerCase() == "knight"){
+                    str = "{% static 'img\pieces\w_horse.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+                }
+                else if(type.toLowerCase() == "queen"){
+                    str = "{% static 'img\pieces\w_queen.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+                }
+                else if(type.toLowerCase() == "king"){
+                    str = "{% static 'img\pieces\w_king.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+                }
+                else if(type.toLowerCase() == "pawn"){
+                    str = "{% static 'img\pieces\w_pawn.png' %}"
+
+                    img.src = str; 
+                    img.id = elements[i].id;
+                }
+                    //  var src = document.getElementById("1-1"); 
+                    
+                    //    src.appendChild(img);
+                elements[i].appendChild(img)
+
+            }
+        }
+
+
 
         var startGame = function(){
 
-
+            
 
             var url = 'http://127.0.0.1:8000/chessengine/getData/'
 
             fetch(url)
             .then((resp) => resp.json())
             .then(function(data){
-                console.log('Data',data)
-                jsonData = JSON.parse(data.chessboard)
-                console.log(jsonData)
-                for (var i = 0; i < 8; i++) {
-                  for (var j = 0; j < 8; j++) {
-
-
-                    var img = document.createElement("img"); 
-                    
-                    type = jsonData[i][j].type.toLowerCase();
-                    console.log("This is the type -- " + type);
-                    if(type.toLowerCase() == "rook"){
-                        str = "{% static 'img\pieces\w_rook.png' %}"
-
-                        img.src = str; 
-                    }
-                    else if(type.toLowerCase() == "bishop"){
-                        str = "{% static 'img\pieces\w_bishop.png' %}"
-
-                        img.src = str; 
-                    }
-                    else if(type.toLowerCase() == "knight"){
-                        str = "{% static 'img\pieces\w_horse.png' %}"
-
-                        img.src = str; 
-                    }
-                    else if(type.toLowerCase() == "queen"){
-                        str = "{% static 'img\pieces\w_queen.png' %}"
-
-                        img.src = str; 
-                    }
-                    else if(type.toLowerCase() == "king"){
-                        str = "{% static 'img\pieces\w_king.png' %}"
-
-                        img.src = str; 
-                    }
-                    else if(type.toLowerCase() == "pawn"){
-                        str = "{% static 'img\pieces\w_pawn.png' %}"
-
-                        img.src = str; 
-                    }
-                    //  var src = document.getElementById("1-1"); 
-                    
-                    //    src.appendChild(img);
-                    correctIndex = i * 8 
-                    elements[correctIndex+j].appendChild(img)
-                  }
-
-                }
+                processBoard(data)
             })
         } 
         
@@ -160,7 +194,7 @@
 
                 selectedPiece: JSON.stringify(moveCords[0]),
                 moveLocation: JSON.stringify(moveCords[1]),
-                gameState: 9
+                gameState: gameStateId.toString()
             };
 
             fetch(url,{
@@ -175,7 +209,9 @@
                 
                 
                 ),
-            }).then(result => console.log('success====:', result))
+            }).then(function(response){
+                renderBoard()
+            })
              .catch(error => console.log('error============:', error));
 
              
