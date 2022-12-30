@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import ChessboardModel, GameStateModel
 from .serializers import ChessboardSerializer, ChessBoardMoveSerializer
+from .engine.chessboard import Chessboard
 import json
 
 # Create your views here.
@@ -15,7 +16,7 @@ import json
 def getData(request):
     gameStateData = GameStateModel.objects.create()
 
-    startBoard = Chessboard("white", "black")
+    startBoard = Chessboard()
 
     result = json.dumps(startBoard.board)
     chessboardData = ChessboardModel(
@@ -29,11 +30,31 @@ def getData(request):
 
 
 @api_view(['POST', 'GET'])
-@csrf_exempt
-def postData(request):
+def twoPointMove(request):
     serializer = ChessBoardMoveSerializer(data=request.data)
+    # what i need is to query this data to find latest chessboard related to this datas foreign key
     if serializer.is_valid():
-        serializer.save()
+
+        # get gamestate id
+        # get latest gameboard
+        # create ChhessBoard based on latest
+        # get cur and next arrays
+        # check if valid move
+
+        gameStateId = serializer.validated_data.get('gameState')
+        latestChessboard = ChessboardModel.objects.all().filter(
+            gameState=gameStateId).latest('date').chessboard
+        chessboard = Chessboard(json.loads(latestChessboard))
+        cur = json.loads(serializer.validated_data.get('selectedPiece'))
+        next = json.loads(serializer.validated_data.get('moveLocation'))
+        print(cur[0])
+        if chessboard.movePiece(cur, next):
+            print("=========================================")
+            print(chessboard.board)
+            print("=========================================")
+
+            serializer.save()
+
     else:
         print(request.data)
         print("HHHHHHHHHHHHHHHHHHEYOOOOOOOOOOOOOOOOOOOOOOOO")

@@ -153,14 +153,14 @@
 
         // move chess pieces
         var moveChessPiece = function(moveCords){
-            var url = 'http://127.0.0.1:8000/chessengine/postData/'
+            var url = "{% url 'postData' %}"
             var token = "{{ csrf_token }}"
 
             const obj = {
 
                 selectedPiece: JSON.stringify(moveCords[0]),
                 moveLocation: JSON.stringify(moveCords[1]),
-                gameState: 1
+                gameState: 9
             };
 
             fetch(url,{
