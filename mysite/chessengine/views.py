@@ -64,15 +64,9 @@ def twoPointMove(request):
         next[0] -= 1
         next[1] -= 1
         if chessboard.movePiece(cur, next):
-            print("=========================================")
-            print(chessboard.board)
-
             chessboardData = ChessboardModel(
-                chessboard=chessboard.getJSONDict(), gameState=gameStateId)
-
+                chessboard=json.dumps(chessboard.getJSONDict()), gameState=gameStateId)
             chessboardData.save()
-            print("=========================================")
-
             serializer.save()
 
     else:

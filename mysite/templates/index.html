@@ -98,15 +98,14 @@
 
 
         var processBoard = function(data, freshBoardFlag=true){
+            jsonData = JSON.parse(data.chessboard);
             if(freshBoardFlag){
-                jsonData = JSON.parse(data.chessboard);
                 gameStateId = JSON.parse(data.gameState);
                 console.log(gameStateId);
                 chessboardFE.setAttribute('id',gameStateId.toString());
 
             }
             else{
-                jsonData = data['chessboard'];
                 gameStateId = data['gameState'];
                 chessboardFE.setAttribute('id',gameStateId.toString());
 
