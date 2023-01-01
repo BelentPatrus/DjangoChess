@@ -14,28 +14,24 @@
             </button>
         </div>
     </nav>
-    <div class="container-lg chessboard">
+    <div class="chessboard">
         {% for nums in range %}
             {% if forloop.counter|divisibleby:2 %}
-                <div class="row">
-                    {% for num in range %}
-                        {% if forloop.counter|divisibleby:2 %}
-                            <div id="{{ nums }}-{{ num }}" class="col black chess-cell"></div>
-                        {% else %}
-                            <div id="{{ nums }}-{{ num }}" class="col white chess-cell"></div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                {% for num in range %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                    {% else %}
+                        <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                    {% endif %}
+                {% endfor %}
             {% else %}
-                <div class="row">
-                    {% for num in range %}
-                        {% if forloop.counter|divisibleby:2 %}
-                            <div id="{{ nums }}-{{ num }}" class="col white chess-cell"></div>
-                        {% else %}
-                            <div id="{{ nums }}-{{ num }}" class="col black chess-cell"></div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                {% for num in range %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                    {% else %}
+                        <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                    {% endif %}
+                {% endfor %}
             {% endif %}
         {% endfor %}
     </div>
@@ -46,6 +42,11 @@
 
         userClicks = [];
         gameStateId = -1;
+
+        PIECE = {
+            P:'♙', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔',
+            p:'♟', r:'♜', n:'♞', b:'♝', q:'♛', k:'♚',
+        };
 
 
 
@@ -58,7 +59,7 @@
                     //send move over for validation
                     userClicks[1] = cellId;
                     moveChessPiece(userClicks)
-                    console.log("send data");
+                    console.log("sent data");
                     userClicks = []
                 }
                 else if(userClicks.length == 0){
@@ -69,10 +70,10 @@
                 if(userClicks.length > 0){
                     userClicks = []
                 }
-                console.log("no")
+                console.log("notboard");
             }
 
-            console.log(userClicks)
+            console.log("Users clicks global var state: " + userClicks);
         })
 
 
@@ -87,21 +88,29 @@
 
 
         var renderBoard = function(){
+            console.log("================================Entering renderBoard==================================");
             var url = 'http://127.0.0.1:8000/chessengine/latestBoard/' + gameStateId;
             fetch(url)
             .then((resp) => resp.json())
             .then(function(data){
                 processBoard(data, false)
             })
+            console.log("================================Exiting renderBoard==================================");
+
         }
 
 
 
         var processBoard = function(data, freshBoardFlag=true){
+            console.log("================================Entering processBoard==================================");
+
             jsonData = JSON.parse(data.chessboard);
             if(freshBoardFlag){
                 gameStateId = JSON.parse(data.gameState);
+                console.log("=========================GAMESTATEID====================================");
                 console.log(gameStateId);
+                console.log("=========================GAMESTATEID====================================");
+
                 chessboardFE.setAttribute('id',gameStateId.toString());
 
             }
@@ -116,53 +125,66 @@
                 while (element.firstChild) {
                     element.removeChild(element.firstChild);
                 }
-                var img = document.createElement("img"); 
+                var div = document.createElement("Div"); 
                     
                 type = jsonData[i].type.toLowerCase();
                 console.log("This is the type -- " + type);
                 if(type.toLowerCase() == "rook"){
-                str = "{% static 'img\pieces\w_rook.png' %}"
+                   txt = document.createTextNode(PIECE.p);
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
                 }
                 else if(type.toLowerCase() == "bishop"){
-                    str = "{% static 'img\pieces\w_bishop.png' %}"
+                    txt = document.createTextNode(PIECE.b);
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    
+
 
                 }
                 else if(type.toLowerCase() == "knight"){
-                    str = "{% static 'img\pieces\w_horse.png' %}"
+                    txt = document.createTextNode(PIECE.n);
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
+
+
                 }
                 else if(type.toLowerCase() == "queen"){
-                    str = "{% static 'img\pieces\w_queen.png' %}"
+                    txt = document.createTextNode(PIECE.q);
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
+
+
                 }
                 else if(type.toLowerCase() == "king"){
-                    str = "{% static 'img\pieces\w_king.png' %}"
+                    txt = document.createTextNode(PIECE.k);
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
+
+
                 }
                 else if(type.toLowerCase() == "pawn"){
-                    str = "{% static 'img\pieces\w_pawn.png' %}"
+                    txt = document.createTextNode(PIECE.p);
 
-                    img.src = str; 
-                    img.id = elements[i].id;
+                    div.appendChild(txt);
+                    div.id = elements[i].id;
+
+
                 }
                     //  var src = document.getElementById("1-1"); 
                     
                     //    src.appendChild(img);
-                elements[i].appendChild(img)
+                elements[i].appendChild(div)
 
             }
+
+            console.log("================================Exiting processBoard==================================");
+
         }
 
 

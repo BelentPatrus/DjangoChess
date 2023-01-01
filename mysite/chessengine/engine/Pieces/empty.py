@@ -5,5 +5,5 @@ class Empty(Piece):
     def __init__(self, team, type):
         super().__init__(team, type)
 
-    def validMoves(self):
-        pass
+    def validMoves(self, board, position):
+        return None
