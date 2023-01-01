@@ -26,7 +26,7 @@ class Chessboard:
             index = index + row
         return result
 
-    def __init__(self, chessBoardModel=None):
+    def __init__(self, chessBoardModel=None, playerTurn=TeamSideE.WHITE):
         if chessBoardModel == None:
 
             self.board = [
@@ -44,6 +44,7 @@ class Chessboard:
             ]
             self.moveLog = []
             self.captureLog = []
+            self.playerTurn = playerTurn
         else:
             self.board = []
             for p in chessBoardModel:
@@ -64,11 +65,10 @@ class Chessboard:
                 else:
                     return
                 self.board.append(tmp)
-
             self.board = self.__convert2D__(self.board)
-
             self.moveLog = []  # come back and fix this must query db
             self.captureLog = []  # come back and fix this must query db
+            self.playerTurn = playerTurn
 
     def movePiece(self, cur, next):
         """
@@ -81,7 +81,12 @@ class Chessboard:
         # moveInfo = move
         # row, col = moveInfo['curr'][0], moveInfo['curr'][1]
         row, col = cur[0], cur[1]
+        selectedP = self.board[row][col]
         print(self.board[row][col])
+        if selectedP.team != self.playerTurn:
+            print("NOT YOUR TURN")
+            return False
+
         moveSet = self.board[row][col].validMoves(self.board, cur)
 
         isValid = False if moveSet is None else tuple(next) in moveSet
@@ -95,7 +100,9 @@ class Chessboard:
             self.board[nextRow][nextCol] = self.board[row][col]
             self.board[row][col] = Empty("Empty", Pieces.EMPTY)
             print('Made move to [{},{}]'.format(nextRow, nextCol))
+            self.toggleTurn()
 
+        print("PLAYER TURN IS NOW " + self.playerTurn)
         return isValid
 
     def getJSONDict(self):
@@ -107,3 +114,7 @@ class Chessboard:
                 chessboardSerialized.append(p.getJSONDict())
 
         return chessboardSerialized
+
+    def toggleTurn(self):
+        self.playerTurn = TeamSideE.BLACK if self.playerTurn == TeamSideE.WHITE else TeamSideE.WHITE
+        return

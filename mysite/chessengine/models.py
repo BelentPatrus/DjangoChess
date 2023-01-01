@@ -11,6 +11,7 @@ class GameStateModel(models.Model):
 class ChessboardModel(models.Model):
     chessboard = models.JSONField()
     date = models.DateTimeField(auto_now=True)
+    playerTurn = models.TextField(max_length=15)
     gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE)
 
 

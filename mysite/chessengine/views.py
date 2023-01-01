@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from .models import ChessboardModel, GameStateModel
 from .serializers import ChessboardSerializer, ChessBoardMoveSerializer
 from .engine.chessboard import Chessboard
+from .engine.TeamSideE import TeamSideE
 import json
 
 # Create your views here.
@@ -29,7 +30,7 @@ def getData(request):
     result = json.dumps(startBoard.getJSONDict())
 
     chessboardData = ChessboardModel(
-        chessboard=result, gameState=gameStateData)
+        chessboard=result, gameState=gameStateData, playerTurn=TeamSideE.WHITE)
 
     chessboardData.save()
     data = ChessboardModel.objects.filter(
@@ -53,9 +54,11 @@ def twoPointMove(request):
         # check if valid move
 
         gameStateId = serializer.validated_data.get('gameState')
-        latestChessboard = ChessboardModel.objects.all().filter(
-            gameState=gameStateId).latest('date').chessboard
-        chessboard = Chessboard(json.loads(latestChessboard))
+        chessboardModelData = ChessboardModel.objects.all().filter(
+            gameState=gameStateId).latest('date')
+        playerTurn = chessboardModelData.playerTurn
+        chessboard = Chessboard(json.loads(
+            chessboardModelData.chessboard), playerTurn)
         cur = json.loads(serializer.validated_data.get('selectedPiece'))
         next = json.loads(serializer.validated_data.get('moveLocation'))
         print(cur)
@@ -65,7 +68,7 @@ def twoPointMove(request):
         next[1] -= 1
         if chessboard.movePiece(cur, next):
             chessboardData = ChessboardModel(
-                chessboard=json.dumps(chessboard.getJSONDict()), gameState=gameStateId)
+                chessboard=json.dumps(chessboard.getJSONDict()), gameState=gameStateId, playerTurn=chessboard.playerTurn)
             chessboardData.save()
             serializer.save()
 

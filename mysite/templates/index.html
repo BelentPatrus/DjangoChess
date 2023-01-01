@@ -36,20 +36,19 @@
         {% endfor %}
     </div>
     <script type="text/javascript">
+        // GLOBAL VARIABLES
         var elements = document.getElementsByClassName("chess-cell");
         var startGameBtn = document.getElementById('startgamebtn');
         var chessboardFE = document.querySelector('.chessboard');
-
         userClicks = [];
         gameStateId = -1;
-
         PIECE = {
             P:'♙', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔',
             p:'♟', r:'♜', n:'♞', b:'♝', q:'♛', k:'♚',
         };
 
 
-
+        // listen for chess move
         document.addEventListener("click", function(event){
             if(event.target.closest('.chess-cell')){
                 cellId = event.target.id.split("-");
@@ -77,6 +76,7 @@
         })
 
 
+        //display chess peice location (div id)
         var myFunction = function(btn) {
             console.log(btn.currentTarget.id);
         };
@@ -86,7 +86,7 @@
         }
 
 
-
+        // renders new board for html
         var renderBoard = function(){
             console.log("================================Entering renderBoard==================================");
             var url = 'http://127.0.0.1:8000/chessengine/latestBoard/' + gameStateId;
@@ -100,7 +100,7 @@
         }
 
 
-
+        // helper function for render board
         var processBoard = function(data, freshBoardFlag=true){
             console.log("================================Entering processBoard==================================");
 
@@ -128,15 +128,32 @@
                 var div = document.createElement("Div"); 
                     
                 type = jsonData[i].type.toLowerCase();
+                team = jsonData[i].team.toLowerCase();
                 console.log("This is the type -- " + type);
                 if(type.toLowerCase() == "rook"){
-                   txt = document.createTextNode(PIECE.p);
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.P);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.p);
+                    }
 
                     div.appendChild(txt);
                     div.id = elements[i].id;
                 }
                 else if(type.toLowerCase() == "bishop"){
-                    txt = document.createTextNode(PIECE.b);
+
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.B);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.b);
+                    }
+
                     div.appendChild(txt);
                     div.id = elements[i].id;
 
@@ -145,7 +162,15 @@
 
                 }
                 else if(type.toLowerCase() == "knight"){
-                    txt = document.createTextNode(PIECE.n);
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.N);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.n);
+                    }
+
 
                     div.appendChild(txt);
                     div.id = elements[i].id;
@@ -153,7 +178,15 @@
 
                 }
                 else if(type.toLowerCase() == "queen"){
-                    txt = document.createTextNode(PIECE.q);
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.Q);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.q);
+                    }
+
 
                     div.appendChild(txt);
                     div.id = elements[i].id;
@@ -161,7 +194,15 @@
 
                 }
                 else if(type.toLowerCase() == "king"){
-                    txt = document.createTextNode(PIECE.k);
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.K);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.k);
+                    }
+
 
                     div.appendChild(txt);
                     div.id = elements[i].id;
@@ -169,7 +210,15 @@
 
                 }
                 else if(type.toLowerCase() == "pawn"){
-                    txt = document.createTextNode(PIECE.p);
+                    if(team == "white"){
+                        txt = document.createTextNode(PIECE.P);
+
+                    }
+                    else{
+
+                        txt = document.createTextNode(PIECE.p);
+                    }
+
 
                     div.appendChild(txt);
                     div.id = elements[i].id;
@@ -188,7 +237,7 @@
         }
 
 
-
+        // start operations when new game is created
         var startGame = function(){
 
             
@@ -206,7 +255,7 @@
 
 
 
-        // move chess pieces
+        // POST chess cords
         var moveChessPiece = function(moveCords){
             var url = "{% url 'postData' %}"
             var token = "{{ csrf_token }}"
