@@ -1,6 +1,10 @@
-/* * {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap');
+
+
+* {
     border: 1px solid black;
-} */
+    font-family: 'Poppins', sans-serif;
+}
 
 body {
     background: linear-gradient(168deg, rgba(195, 109, 34, 1), rgba(253, 45, 137, 1) 57%);
@@ -58,4 +62,83 @@ body {
     display: table-cell;
     vertical-align: middle;
     border: 1px solid black;
+}
+
+
+
+.homepage-menu {
+    height: 100vh;
+}
+
+.homepage-menu .row .col {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+
+}
+
+
+
+/* Shutter In Vertical */
+.hvr-shutter-in-vertical {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    position: relative;
+    background: #5f1a1a;
+    -webkit-transition-property: color;
+    transition-property: color;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+
+.hvr-shutter-in-vertical:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #e1e1e1;
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+    -webkit-transform-origin: 50%;
+    transform-origin: 50%;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+    background-image: url("../img/pieces/homepage-match.jpg");
+    background-color: #cccccc;
+    background-size: auto;
+    background-position: center;
+    background-size: contain;
+}
+
+.hvr-shutter-in-vertical:hover,
+.hvr-shutter-in-vertical:focus,
+.hvr-shutter-in-vertical:active {
+    color: white;
+}
+
+.hvr-shutter-in-vertical:hover:before,
+.hvr-shutter-in-vertical:focus:before,
+.hvr-shutter-in-vertical:active:before {
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+}
+
+#match {
+    background-image: url("../img/pieces/homepage-match-hover.jpg");
+    background-color: #cccccc;
+    background-size: auto;
+    background-position: center;
+    background-size: contain;
 }
