@@ -1,9 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap');
 
 
-* {
+/* * {
     border: 1px solid black;
     font-family: 'Poppins', sans-serif;
+} */
+
+a {
+    text-decoration: none;
 }
 
 body {
@@ -89,11 +93,11 @@ body {
     transform: perspective(1px) translateZ(0);
     box-shadow: 0 0 1px rgba(0, 0, 0, 0);
     position: relative;
-    background: #5f1a1a;
     -webkit-transition-property: color;
     transition-property: color;
     -webkit-transition-duration: 0.3s;
     transition-duration: 0.3s;
+    color: black;
 }
 
 .hvr-shutter-in-vertical:before {
@@ -104,7 +108,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: #e1e1e1;
+    background: #ffffff;
     -webkit-transform: scaleY(1);
     transform: scaleY(1);
     -webkit-transform-origin: 50%;
@@ -115,17 +119,25 @@ body {
     transition-duration: 0.3s;
     -webkit-transition-timing-function: ease-out;
     transition-timing-function: ease-out;
-    background-image: url("../img/pieces/homepage-match.jpg");
-    background-color: #cccccc;
-    background-size: auto;
-    background-position: center;
-    background-size: contain;
+
 }
+
+/* .bg-image:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgba(84, 21, 21, 0.425);
+} */
 
 .hvr-shutter-in-vertical:hover,
 .hvr-shutter-in-vertical:focus,
 .hvr-shutter-in-vertical:active {
     color: white;
+    border: 1px solid white;
+    cursor: pointer;
 }
 
 .hvr-shutter-in-vertical:hover:before,
@@ -135,10 +147,39 @@ body {
     transform: scaleY(0);
 }
 
-#match {
-    background-image: url("../img/pieces/homepage-match-hover.jpg");
-    background-color: #cccccc;
+#match::before {
+    background-image: url("../img/pieces/homepage-match.jpg");
+    background-color: #fdf7f77e;
     background-size: auto;
     background-position: center;
     background-size: contain;
+    background-blend-mode: lighten;
+}
+
+#match {
+    background-image: url("../img/pieces/homepage-match-hover.jpg");
+    background-color: #f7f2f265;
+    background-size: auto;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: multiply;
+    background-repeat: no-repeat;
+}
+
+#stats::before {
+    background-image: url("../img/pieces/homepage-stats.jpg");
+    background-color: #fdf7f77e;
+    background-size: auto;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: lighten;
+}
+
+#settings::before {
+    background-image: url("../img/pieces/homepage-settings.jpg");
+    background-color: #fdf7f77e;
+    background-size: auto;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: lighten;
 }
