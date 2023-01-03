@@ -9,3 +9,8 @@ def home(request):
         "range": rangeset,
     }
     return render(request, 'index.html', context)
+
+
+def homepage(request):
+
+    return render(request, 'homepage.html')

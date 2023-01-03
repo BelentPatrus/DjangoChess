@@ -22,6 +22,8 @@ from django.contrib import staticfiles
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
+    path('homepage/', views.homepage, name="homepage"),
+
     path('chessengine/', include('chessengine.urls'))
 
 ]
