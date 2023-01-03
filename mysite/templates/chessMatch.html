@@ -89,7 +89,7 @@
         // renders new board for html
         var renderBoard = function(){
             console.log("================================Entering renderBoard==================================");
-            var url = 'http://127.0.0.1:8000/chessengine/latestBoard/' + gameStateId;
+            var url = 'http://127.0.0.1:8000/chess/latestBoard/' + gameStateId;
             fetch(url)
             .then((resp) => resp.json())
             .then(function(data){
@@ -242,7 +242,7 @@
 
             
 
-            var url = 'http://127.0.0.1:8000/chessengine/getData/'
+            var url = 'http://127.0.0.1:8000/chess/getData/'
 
             fetch(url)
             .then((resp) => resp.json())
