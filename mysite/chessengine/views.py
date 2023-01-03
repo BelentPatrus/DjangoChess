@@ -1,5 +1,6 @@
 
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 from .engine.chessboard import Chessboard
 
 from rest_framework.response import Response
@@ -77,3 +78,20 @@ def twoPointMove(request):
         print("here")
 
     return Response(serializer.data)
+
+
+@csrf_exempt
+def chessMatch(request, match_id):
+    rangeset = range(1, 9)
+    context = {
+        "range": rangeset,
+    }
+    return render(request, 'chessMatch.html', context)
+
+
+def lobby(request):
+    rangeset = range(1, 9)
+    context = {
+        "range": rangeset,
+    }
+    return render(request, 'lobby.html', context)
