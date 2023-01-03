@@ -1,6 +1,7 @@
 
 from django.views.decorators.csrf import csrf_exempt
 from .engine.chessboard import Chessboard
+from chessengine.engine.Pieces.empty import Empty
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -77,3 +78,33 @@ def twoPointMove(request):
         print("here")
 
     return Response(serializer.data)
+
+@api_view(['POST','GET'])
+def getAvailableMoves(request):
+    # Get available moves for the chess piece in question
+    
+    gameStateId = request.data['gameState']  
+    chessboardModelData = ChessboardModel.objects.all().filter(
+        gameState=gameStateId).latest('date')
+    playerTurn = chessboardModelData.playerTurn
+    chessboard= Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
+    position= json.loads(request.data['pieceLocation'])
+    position[0] -=1
+    position[1] -=1
+    moveSet = chessboard.getPieceMoves(position)
+
+    for move in moveSet:
+        for i in range(len(move)):
+            move[i] += 1
+    data = {
+        'moveSet' : moveSet
+    }
+    return Response(data)
+        
+        
+        
+
+
+
+    
+

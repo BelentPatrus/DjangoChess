@@ -63,6 +63,8 @@
                 }
                 else if(userClicks.length == 0){
                     userClicks[0] = cellId;
+                    // call highlight moveset for piece location
+                    movesetHighlighter(userClicks)
                 }
             }
             else{
@@ -285,6 +287,32 @@
              .catch(error => console.log('error============:', error));
 
              
+
+        }
+        
+        var movesetHighlighter = function(pieceCord){
+            var url = "{% url 'postMoveset' %}"
+            var token = "{{ csrf_token }}"
+
+            const obj = {
+                pieceLocation: JSON.stringify(pieceCord[0]),
+                gameState: gameStateId.toString()
+            };
+
+            fetch(url,{
+                method: 'POST',
+                headers: {
+                    'Content-type':'application/json',
+                    'X-CSRFToken' : token,
+                },
+                body: JSON.stringify(obj),
+            })
+            .then(res => res.json())
+            .then(data => console.log(data))
+            .then(arr => console.log(arr))
+            .catch(error => console.log('error============:', error));
+
+
 
         }
 

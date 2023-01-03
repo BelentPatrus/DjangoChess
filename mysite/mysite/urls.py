@@ -24,5 +24,4 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('chessengine/', include('chessengine.urls'))
 
-
 ]

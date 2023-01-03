@@ -105,6 +105,10 @@ class Chessboard:
         print("PLAYER TURN IS NOW " + self.playerTurn)
         return isValid
 
+
+    def getPieceMoves(self, position):
+        return self.board[position[0]][position[1]].validMoves(self.board, position)
+
     def getJSONDict(self):
         # need to serialize the board
         chessboardSerialized = []

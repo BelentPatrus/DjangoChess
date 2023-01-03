@@ -8,6 +8,5 @@ urlpatterns = [
     path('latestBoard/<int:gameStateId>',
          views.getLatestChessBoardData, name="latestBoard"),
 
-
-
+    path('postMoveset/', views.getAvailableMoves, name="postMoveset")
 ]
