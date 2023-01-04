@@ -287,7 +287,6 @@
              .catch(error => console.log('error============:', error));
 
              
-
         }
         
         var movesetHighlighter = function(pieceCord){
@@ -308,11 +307,15 @@
                 body: JSON.stringify(obj),
             })
             .then(res => res.json())
-            .then(data => console.log(data))
-            .then(arr => console.log(arr))
+            .then((data) => {
+                data['moveSet'].forEach(item =>{
+                    var id = item[0]+"-"+item[1]
+                    var cell = document.getElementById(id)
+                    cell.classList.add('highlight-move')
+                })
+            
+            })
             .catch(error => console.log('error============:', error));
-
-
 
         }
 

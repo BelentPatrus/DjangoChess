@@ -33,6 +33,10 @@ body {
     align-items: center;
 }
 
+.highlight-move{
+    background-color: white !important;
+}
+
 .chessboard {
     width: 660px;
     height: 660px;
@@ -182,4 +186,8 @@ body {
     background-position: center;
     background-size: cover;
     background-blend-mode: lighten;
+}
+
+.highlightMove{
+    background-color: white;
 }
