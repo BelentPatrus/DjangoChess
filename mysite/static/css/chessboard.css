@@ -1,0 +1,38 @@
+.chessboard {
+    width: 660px;
+    height: 660px;
+    margin: auto;
+    border: 10px solid #000;
+    border-radius: 4px;
+    background: #e59110;
+    box-shadow: 5px 5px 8px #bebdb6,
+        -5px -5px 8px #ffffff;
+}
+
+.highlight-move {
+    background-color: white !important;
+}
+
+.black {
+    float: left;
+    width: 80px;
+    height: 80px;
+    background-color: #e59110;
+    font-size: 50px;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    border: 1px solid black;
+}
+
+.white {
+    float: left;
+    width: 80px;
+    height: 80px;
+    background-color: #ffcfb6;
+    font-size: 50px;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    border: 1px solid black;
+}

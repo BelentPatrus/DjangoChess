@@ -15,9 +15,9 @@ class Rook(Piece):
         i = 1
         # white: up, black: down
         while row-i >= 0 and board[row-i][col].team.lower() != pieceTeam:
-            # print('piece team: {}, board piece team: {}'.format(board[row-i][col].team.lower(), pieceTeam])
-            # print('valid Move u:{}'.format([row-i,col]])
-            moves.append([row-i, col])
+            # print('piece team: {}, board piece team: {}'.format(board[row-i][col].team.lower(), pieceTeam))
+            # print('valid Move u:{}'.format((row-i,col]))
+            moves.append((row-i, col))
             if not isinstance(board[row-i][col], Empty):
                 break
             i+=1
@@ -25,9 +25,9 @@ class Rook(Piece):
         # white: down, black: up
         i = 1
         while row+i < 8 and board[row+i][col].team.lower() != pieceTeam:
-            # print('piece team: {}, board piece team: {}'.format(board[row+i][col].team.lower(), pieceTeam])
-            # print('valid Move d :{}'.format([row+i,col]])
-            moves.append([row+i,col])
+            # print('piece team: {}, board piece team: {}'.format(board[row+i][col].team.lower(), pieceTeam))
+            # print('valid Move d :{}'.format((row+i,col]))
+            moves.append((row+i,col))
             if not isinstance(board[row+i][col], Empty):
                 break
             i+=1
@@ -35,9 +35,9 @@ class Rook(Piece):
         i = 1
         # white: right, black: left
         while col+i < 8 and board[row][col+i].team.lower() != pieceTeam:
-            # print('piece team: {}, board piece team: {}'.format(board[row][col+i].team.lower(), pieceTeam])
-            # print('valid Move r :{}'.format([row,col+i]])
-            moves.append([row, col+i])
+            # print('piece team: {}, board piece team: {}'.format(board[row][col+i].team.lower(), pieceTeam))
+            # print('valid Move r :{}'.format((row,col+i]))
+            moves.append((row, col+i))
             if not isinstance(board[row][col+i], Empty):
                 break
             i+=1
@@ -45,9 +45,9 @@ class Rook(Piece):
         i = 1
         # white: left, black: right
         while col-i >= 0 and board[row][col-i].team.lower() != pieceTeam:
-            # print('piece team: {}, board piece team: {}'.format(board[row][col-i].team.lower(), pieceTeam])
-            # print('valid Move r :{}'.format([row,col-i]])
-            moves.append([row, col-i])
+            # print('piece team: {}, board piece team: {}'.format(board[row][col-i].team.lower(), pieceTeam))
+            # print('valid Move r :{}'.format((row,col-i]))
+            moves.append((row, col-i))
             if not isinstance(board[row][col-i], Empty):
                 break
             i+=1
