@@ -44,6 +44,7 @@ def getData(request):
 
 @api_view(['POST', 'GET'])
 def twoPointMove(request):
+    data ={}
     serializer = ChessBoardMoveSerializer(data=request.data)
     # what i need is to query this data to find latest chessboard related to this datas foreign key
     if serializer.is_valid():
@@ -68,7 +69,9 @@ def twoPointMove(request):
         cur[1] -= 1
         next[0] -= 1
         next[1] -= 1
-        if chessboard.movePiece(cur, next):
+        if chessboard.board[cur[0]][cur[1]].team.lower() == chessboard.board[next[0]][next[1]].team.lower():
+            data['sameTeam'] = True
+        elif chessboard.movePiece(cur, next):
             chessboardData = ChessboardModel(
                 chessboard=json.dumps(chessboard.getJSONDict()), gameState=gameStateId, playerTurn=chessboard.playerTurn)
             chessboardData.save()
@@ -77,8 +80,8 @@ def twoPointMove(request):
     else:
         print(request.data)
         print("here")
-
-    return Response(serializer.data)
+    data['data'] = serializer.data
+    return Response(data)
 
 
 @csrf_exempt
@@ -97,6 +100,16 @@ def lobby(request):
     }
     return render(request, 'lobby.html', context)
 
+@api_view(['GET'])
+def processClick(request):
+    """
+        This function will process the click of a user determining which action to take regarding these situations:
+        1. Blank cell clicked : nothing to be done.
+        2. Piece Clicked : returns the highlighted moves arr if playerTurn clicked their piece.
+        3. Trying to take a piece : 
+
+    """
+
 @api_view(['POST','GET'])
 def getAvailableMoves(request):
     # Get available moves for the chess piece in question
@@ -111,23 +124,12 @@ def getAvailableMoves(request):
     position[1] -=1
     moveSet = chessboard.getPieceMoves(position)
     moveSetList = []
-    print(moveSet)
     for move in moveSet:
         move = list(move)
-        print(move)
         for i in range(len(move)):
             move[i] += 1
-        print(move)
         moveSetList.append(move)
     data = {
         'moveSet' : moveSetList
     }
     return Response(data)
-        
-        
-        
-
-
-
-    
-

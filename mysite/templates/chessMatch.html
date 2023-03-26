@@ -40,7 +40,6 @@
     </div>
     <script type="text/javascript">
         // GLOBAL VARIABLES
-        var highlightPiece = []
         var elements = document.getElementsByClassName("chess-cell");
         var startGameBtn = document.getElementById('startgamebtn');
         var chessboardFE = document.querySelector('.chessboard');
@@ -52,33 +51,90 @@
         };
 
 
-        // listen for chess move
-        document.addEventListener("click", function(event){
+        document.addEventListener('click', function(event){
             if(event.target.closest('.chess-cell')){
-                cellId = event.target.id.split("-");
-                cellId[0] = parseInt(cellId[0]);
-                cellId[1] = parseInt(cellId[1]);
-                if(userClicks.length == 1){
-                    //send move over for validation
-                    userClicks[1] = cellId;
-                    moveChessPiece(userClicks)
-                    console.log("sent data");
-                    userClicks = []
+                cellID = event.target.id.split('-');
+                cellID[0] = parseInt(cellID[0]);
+                cellID[1] = parseInt(cellID[1]);
+                // Clicked same cell or piece as before
+                if(userClicks.length == 1 && cellID[0] === userClicks[0][0] && celID[1] === userClicks[0][1]){
+                    return;
                 }
-                else if(userClicks.length == 0){
-                    userClicks[0] = cellId;
-                    movesetHighlighter(userClicks)
-                }
-            }
-            else{
-                if(userClicks.length > 0){
-                    userClicks = []
-                }
-                console.log("notboard");
-            }
+                userClicks.push(cellID);
+                chessBoardClicked(userClicks);
 
-            console.log("Users clicks global var state: " + userClicks);
+            }
         })
+        // listen for chess move
+        // every time a click is made at it to user clicks.
+        // if there is only one click highlight piece.
+        // if there is another click on the chess board.
+            // check if the other click is on the team turn.
+                // if it is on team turn return position and highlight but unhighlight previous click.
+                // if it is a empty piece or enemy piece check if it is valid return it.
+        // if it outside chess board, empty userclicks and unhighlight all cells.
+        // document.addEventListener('click', function(event){
+        //     if(event.target.closest('.chess-cell')){
+        //         cellId = event.target.id.split('-');
+        //         cellId[0] = parseInt(cellId[0]);
+        //         cellId[1] = parseInt(cellId[1]);
+        //         userClicks.push(cellId);
+        //         if(userClicks.length == 1){
+        //             movesetHighlighter(userClicks[0])
+        //         }else if(userClicks.length == 2){
+        //             if(userClicks[0] != userClicks[1]){
+        //                 moveChessPiece(userClicks)
+        //                 userClicks = []
+        //             }
+        //         }
+        //     }else{
+        //         if(userClicks.length > 0){
+        //             userClicks = []
+        //         }
+        //         highlightElems = document.querySelectorAll('.highlight-move')
+        //         highlightElems.forEach((elem) =>{
+        //             elem.classList.remove('highlight-move')
+        //         })
+        //     }
+        //     console.log('userClicks length: ' + userClicks + 'userClicks array: \n' + userClicks.length);
+        // })
+
+
+
+
+
+        // document.addEventListener("click", function(event){
+        //     if(event.target.closest('.chess-cell')){
+        //         cellId = event.target.id.split("-");
+        //         cellId[0] = parseInt(cellId[0]);
+        //         cellId[1] = parseInt(cellId[1]);
+        //         if(userClicks.length == 1){
+        //             //send move over for validation
+        //             userClicks[1] = cellId;
+        //             moveChessPiece(userClicks)
+        //             console.log("sent data");
+        //             userClicks = []
+        //         }
+        //         else if(userClicks.length == 0){
+        //             userClicks[0] = cellId;
+        //             movesetHighlighter(userClicks)
+        //         }
+        //     }
+        //     else{
+        //         if(userClicks.length > 0){
+        //             userClicks = []
+        //         }
+        //         highlightElems = document.querySelectorAll('.highlight-move')
+        //         highlightElems.forEach((elem) =>{
+        //             elem.classList.remove('highlight-move')
+        //         })
+
+                
+        //         console.log("notboard");
+        //     }
+
+        //     console.log("Users clicks global var state: " + userClicks);
+        // })
 
 
 
@@ -260,49 +316,75 @@
         startGameBtn.addEventListener("click",startGame);
 
 
+        // chess board clicked
+        var chessBoardClicked = async function(clicks){
+            var url = "{% url 'processClick' %}"
+            var token = "{{ csrf_token }}"
+            const obj = {
+                cords: JSON.stringify(clicks),
+                gamestate: gameStateId.toString()
+            };
+            try {
+                let res = await fetch(url,{
+                    method: 'POST',
+                    headers: {
+                        'Content-type':'application/json',
+                        'X-CSRFToken' : token,
+                    },
+                    body: JSON.stringify(obj)
+                })
+
+                let data = res.json();
+
+            } catch(err){
+                console.log('Error: '+err);
+            }
+        }
 
         // POST chess cords
-        var moveChessPiece = function(moveCords){
+        var moveChessPiece = async function(moveCords){
             var url = "{% url 'postData' %}"
             var token = "{{ csrf_token }}"
 
             const obj = {
-
                 selectedPiece: JSON.stringify(moveCords[0]),
                 moveLocation: JSON.stringify(moveCords[1]),
                 gameState: gameStateId.toString()
             };
-
-            fetch(url,{
-                method: 'POST',
-                headers: {
+            try{
+                let res = await fetch(url,{
+                    method: 'POST',
+                    headers: {
                     'Content-type':'application/json',
                     'X-CSRFToken' : token,
-                },
-                body: JSON.stringify(
-                    
-                obj
-                
-                
-                ),
-            }).then(function(response){
+                    },
+                    body: JSON.stringify(obj),
+                })
+                let data = await res.json()
+                if(data['sameTeam']){
+                    removeMovesetHighlighter(userClicks[0])
+                    movesetHighlighter(userClicks[1])
+                }
+                console.log('Serilizar data: \n'+data['data'])
                 renderBoard()
-            })
-             .catch(error => console.log('error============:', error));
-
-             
+            }catch(err){
+                console.log('Errroooor: ')
+            }
 
         }
-        var movesetHighlighter = function(pieceCord){
+            
+        
+
+        var movesetHighlighter = async function(cord){
             var url = "{% url 'postMoveset' %}"
             var token = "{{ csrf_token }}"
 
             const obj = {
-                pieceLocation: JSON.stringify(pieceCord[0]),
+                pieceLocation: JSON.stringify(cord),
                 gameState: gameStateId.toString()
             };
 
-            fetch(url,{
+            let res = await fetch(url,{
                 method: 'POST',
                 headers: {
                     'Content-type':'application/json',
@@ -310,18 +392,46 @@
                 },
                 body: JSON.stringify(obj),
             })
-            .then(res => res.json())
-            .then((data) => {
-                data['moveSet'].forEach(item =>{
-                    var id = item[0]+"-"+item[1]
-                    var cell = document.getElementById(id)
-                    cell.classList.add('highlight-move')
-                })
-            
+            let data =  await res.json();
+            data['moveSet'].forEach((item) =>{
+                var id = item[0]+"-"+item[1]
+                var cell = document.getElementById(id)
+                cell.classList.add('highlight-move')
             })
-            .catch(error => console.log('error============:', error));
+        }
+            
+        
+        
+        //Removes highlighter of the moveset for the specific piece when given the cord to that piece.
+        var removeMovesetHighlighter = async function(cord){
+            var url = "{% url 'postMoveset' %}"
+            var token = "{{ csrf_token }}"
+
+            const obj = {
+                pieceLocation: JSON.stringify(cord),
+                gameState: gameStateId.toString()
+            };
+            try{
+                let res = await fetch(url,{
+                method: 'POST',
+                headers: {
+                    'Content-type':'application/json',
+                    'X-CSRFToken' : token,
+                },
+                body: JSON.stringify(obj),
+            })
+                let data = await res.json()
+                data['moveSet'].forEach((elem) =>{
+                    var id = elem[0]+"-"+elem[1]
+                    var cell = document.getElementById(id)
+                    cell.classList.remove('highlight-move')
+                })
+            }catch(err){
+                console.log(err);
+            }
 
         }
+        
 
         
 
