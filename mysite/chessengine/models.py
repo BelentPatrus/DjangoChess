@@ -16,8 +16,7 @@ class ChessboardModel(models.Model):
 
 
 class ChessBoardMove(models.Model):
-    selectedPiece = models.JSONField()
-    moveLocation = models.JSONField()
+    cords = models.JSONField()
     result = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)
     gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE)

@@ -42,7 +42,6 @@ def getData(request):
     return Response(serializer.data)
 
 
-@api_view(['POST', 'GET'])
 def twoPointMove(request):
     data ={}
     serializer = ChessBoardMoveSerializer(data=request.data)
@@ -62,8 +61,8 @@ def twoPointMove(request):
         playerTurn = chessboardModelData.playerTurn
         chessboard = Chessboard(json.loads(
             chessboardModelData.chessboard), playerTurn)
-        cur = json.loads(serializer.validated_data.get('selectedPiece'))
-        next = json.loads(serializer.validated_data.get('moveLocation'))
+        cur = json.loads(serializer.validated_data.get('cords'))[0]
+        next = json.loads(serializer.validated_data.get('cords'))[1]
         print(cur)
         cur[0] -= 1
         cur[1] -= 1
@@ -76,12 +75,13 @@ def twoPointMove(request):
                 chessboard=json.dumps(chessboard.getJSONDict()), gameState=gameStateId, playerTurn=chessboard.playerTurn)
             chessboardData.save()
             serializer.save()
+            data['sameTeam'] = False
 
     else:
         print(request.data)
         print("here")
     data['data'] = serializer.data
-    return Response(data)
+    return data
 
 
 @csrf_exempt
@@ -100,17 +100,29 @@ def lobby(request):
     }
     return render(request, 'lobby.html', context)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def processClick(request):
     """
         This function will process the click of a user determining which action to take regarding these situations:
-        1. Blank cell clicked : nothing to be done.
-        2. Piece Clicked : returns the highlighted moves arr if playerTurn clicked their piece.
-        3. Trying to take a piece : 
-
+        1. Piece Clicked : returns the highlighted moves arr if playerTurn clicked their piece.
+        2. Move Piece : makes move on chess board
     """
+    numClicks = len(json.loads(request.data['cords']))
+    if numClicks == 2:
+        moveDict = twoPointMove(request)
+        moveDict['Operation'] = 'move'
+        return Response(moveDict)
+        
+    elif numClicks == 1:
+       highlightDict = getAvailableMoves(request)
+       highlightDict['Operation'] = 'highlight'
+       return Response(highlightDict)
 
-@api_view(['POST','GET'])
+    print(f"Wasn't caught by any of the if statements UserClicks: {request.data['cords']}, Length: {request.data['cords']}")   
+
+
+
+
 def getAvailableMoves(request):
     # Get available moves for the chess piece in question
     
@@ -119,9 +131,9 @@ def getAvailableMoves(request):
         gameState=gameStateId).latest('date')
     playerTurn = chessboardModelData.playerTurn
     chessboard= Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
-    position= json.loads(request.data['pieceLocation'])
-    position[0] -=1
-    position[1] -=1
+    position= json.loads(request.data['cords'])[0]
+    position[0] -= 1
+    position[1] -= 1
     moveSet = chessboard.getPieceMoves(position)
     moveSetList = []
     for move in moveSet:
@@ -132,4 +144,4 @@ def getAvailableMoves(request):
     data = {
         'moveSet' : moveSetList
     }
-    return Response(data)
+    return data

@@ -56,15 +56,36 @@
                 cellID = event.target.id.split('-');
                 cellID[0] = parseInt(cellID[0]);
                 cellID[1] = parseInt(cellID[1]);
-                // Clicked same cell or piece as before
-                if(userClicks.length == 1 && cellID[0] === userClicks[0][0] && celID[1] === userClicks[0][1]){
+                // Clicked same piece as before
+                if(userClicks.length == 1 && cellID[0] === userClicks[0][0] && cellID[1] === userClicks[0][1]){
+                    console.log('Clicked same piece as before userClicks: '+ userClicks+' eventClick: '+cellID);
                     return;
                 }
                 userClicks.push(cellID);
+                //Check if only a empty cell was clicked
+                let testID = document.getElementById(event.target.id);
+                if(userClicks.length == 1 &&  !isPiece(testID)){
+                    userClicks = [];
+                    return;
+                }
                 chessBoardClicked(userClicks);
-
             }
         })
+
+        var isPiece = function(cellDiv){
+            /*
+                args: chess cell.
+                return: true or false, chess piece cell or empty.
+            */
+            console.log(cellDiv.childNodes);
+            const childDiv = cellDiv.firstElementChild;
+            if(childDiv.hasAttribute('id')){
+                return true;
+            }
+            return false;
+        }
+
+        
         // listen for chess move
         // every time a click is made at it to user clicks.
         // if there is only one click highlight piece.
@@ -318,11 +339,17 @@
 
         // chess board clicked
         var chessBoardClicked = async function(clicks){
+            /*
+                args: userClicks Global Array
+                Deals with the clicking events in python and based on that result does an operation:
+                    - highlighing cells
+                    - moves a chess piece
+            */
             var url = "{% url 'processClick' %}"
             var token = "{{ csrf_token }}"
             const obj = {
                 cords: JSON.stringify(clicks),
-                gamestate: gameStateId.toString()
+                gameState: gameStateId.toString()
             };
             try {
                 let res = await fetch(url,{
@@ -333,107 +360,47 @@
                     },
                     body: JSON.stringify(obj)
                 })
+                let data = await res.json();
+                console.log(data);
+                if(data['sameTeam']){
+                    userClicks[0] = userClicks[1];
+                    userClicks.splice(1,1);
+                    chessBoardClicked(userClicks);
+                }else if(data['Operation'] === 'highlight'){
+                    movesetHighlighter(data['moveSet']);
+                }else if(data['Operation'] === 'move'){
+                    removeHighlight();
+                    renderBoard();
+                    userClicks = [];
+                }
+                console.log('End of click event handler | userClicks: ' + userClicks + ' Data: ' + data);
 
-                let data = res.json();
-
-            } catch(err){
+            }catch(err){
                 console.log('Error: '+err);
             }
         }
-
-        // POST chess cords
-        var moveChessPiece = async function(moveCords){
-            var url = "{% url 'postData' %}"
-            var token = "{{ csrf_token }}"
-
-            const obj = {
-                selectedPiece: JSON.stringify(moveCords[0]),
-                moveLocation: JSON.stringify(moveCords[1]),
-                gameState: gameStateId.toString()
-            };
-            try{
-                let res = await fetch(url,{
-                    method: 'POST',
-                    headers: {
-                    'Content-type':'application/json',
-                    'X-CSRFToken' : token,
-                    },
-                    body: JSON.stringify(obj),
-                })
-                let data = await res.json()
-                if(data['sameTeam']){
-                    removeMovesetHighlighter(userClicks[0])
-                    movesetHighlighter(userClicks[1])
-                }
-                console.log('Serilizar data: \n'+data['data'])
-                renderBoard()
-            }catch(err){
-                console.log('Errroooor: ')
-            }
-
-        }
             
-        
-
-        var movesetHighlighter = async function(cord){
-            var url = "{% url 'postMoveset' %}"
-            var token = "{{ csrf_token }}"
-
-            const obj = {
-                pieceLocation: JSON.stringify(cord),
-                gameState: gameStateId.toString()
-            };
-
-            let res = await fetch(url,{
-                method: 'POST',
-                headers: {
-                    'Content-type':'application/json',
-                    'X-CSRFToken' : token,
-                },
-                body: JSON.stringify(obj),
-            })
-            let data =  await res.json();
-            data['moveSet'].forEach((item) =>{
+        var movesetHighlighter = async function(highlightCords){
+            /* 
+                args: list of cordinates in 2d array
+                action: removes previous highlighting and adds highlight css to the args
+            */
+            removeHighlight();
+            highlightCords.forEach((item) =>{
                 var id = item[0]+"-"+item[1]
                 var cell = document.getElementById(id)
                 cell.classList.add('highlight-move')
             })
         }
-            
-        
-        
-        //Removes highlighter of the moveset for the specific piece when given the cord to that piece.
-        var removeMovesetHighlighter = async function(cord){
-            var url = "{% url 'postMoveset' %}"
-            var token = "{{ csrf_token }}"
-
-            const obj = {
-                pieceLocation: JSON.stringify(cord),
-                gameState: gameStateId.toString()
-            };
-            try{
-                let res = await fetch(url,{
-                method: 'POST',
-                headers: {
-                    'Content-type':'application/json',
-                    'X-CSRFToken' : token,
-                },
-                body: JSON.stringify(obj),
+        var removeHighlight = function(){
+            /*
+                action: removes all highlighting on the board
+            */
+            var elements = document.querySelectorAll('.highlight-move');
+            elements.forEach((cell)=>{
+                cell.classList.remove('highlight-move');
             })
-                let data = await res.json()
-                data['moveSet'].forEach((elem) =>{
-                    var id = elem[0]+"-"+elem[1]
-                    var cell = document.getElementById(id)
-                    cell.classList.remove('highlight-move')
-                })
-            }catch(err){
-                console.log(err);
-            }
-
         }
-        
-
-        
 
     </script>
 {% endblock content %}
