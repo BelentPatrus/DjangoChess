@@ -1,0 +1,4 @@
+# These are modules used for this project
+# For quick install use pip install -r requirements.txt
+Django==4.1.4
+djangorestframework==3.14.0
