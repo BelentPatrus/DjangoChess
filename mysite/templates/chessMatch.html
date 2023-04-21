@@ -11,6 +11,7 @@
     <nav class="navbar navbar-expand-lg navbar-tasks ">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Navbar</a>
+            <h3 id="connection-status"></h3>
             <!-- Button trigger modal -->
             <button type="button"
                     id="startgamebtn"
@@ -21,32 +22,54 @@
             </button>
         </div>
     </nav>
-    <div class="chessboard">
-        {% for nums in range %}
-            {% if forloop.counter|divisibleby:2 %}
-                {% for num in range %}
-                    {% if forloop.counter|divisibleby:2 %}
-                        <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
-                    {% else %}
-                        <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                {% for num in range %}
-                    {% if forloop.counter|divisibleby:2 %}
-                        <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
-                    {% else %}
-                        <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
+    <div class="d-flex p-2 justify-content-center">
+        <div class="chessboard">
+            {% for nums in range %}
+                {% if forloop.counter|divisibleby:2 %}
+                    {% for num in range %}
+                        {% if forloop.counter|divisibleby:2 %}
+                            <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                        {% else %}
+                            <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% for num in range %}
+                        {% if forloop.counter|divisibleby:2 %}
+                            <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                        {% else %}
+                            <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="chat m-3">
+            <textarea id="chat-log" cols="50" rows="20"></textarea><br />
+            <input id="chat-message-input" type="text" size="45" /><br />
+            <input id="chat-message-submit" type="button" value="Send" />
+        </div>
     </div>
+    {{ match_id|json_script:"room-name" }}
+
     <script >
-        const startGameBtn = document.getElementById("startgamebtn");
-        const chessboard = new Chessboard();
-        const game = new Game(chessboard);
         const processClickUrl = "{% url 'processClick' %}";
+        const roomName = JSON.parse(document.getElementById("room-name").textContent);
+        const playerSocket = new WebSocket("ws://" + window.location.host + "/ws/chess/match/" + roomName + "/");
+
+        playerSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            console.log(data);
+            document.querySelector("#chat-log").value += data.message + "\n";
+        }
+        playerSocket.onclose = function (e) {
+            console.error("Chat socket closed unexpectedly");
+        };
+
+
+        
+        const startGameBtn = document.getElementById("startgamebtn");
+        const game = new Game(new Chessboard());
 
         document.addEventListener("click", function(event) {
             game.setupEventListener(event);
@@ -56,6 +79,29 @@
             game.startGame()
             
         });
+
+
+        document.querySelector("#chat-message-input").focus();
+        document.querySelector("#chat-message-input").onkeyup = function (e) {
+        if (e.keyCode === 13) {
+            // enter, return
+            document.querySelector("#chat-message-submit").click();
+            }
+        };
+
+        document.querySelector("#chat-message-submit").onclick = function (e) {
+            const messageInputDom = document.querySelector("#chat-message-input");
+            const message = messageInputDom.value;
+            playerSocket.send(
+            JSON.stringify({
+                message: message,
+            })
+            );
+            messageInputDom.value = "";
+        };
+
+
+
 
     </script>
     
