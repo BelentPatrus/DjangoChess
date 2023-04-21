@@ -1,0 +1,52 @@
+/* *{
+    border: 1px solid white !important; 
+} */
+:root {
+  --primary-color: #343776;
+  --secondary-color: #000247;
+  --chess-cell-color: #7a7ede;
+  --chess-cell2-color: #d9d9d9;
+  --border-highlight-color: #0963bc;
+}
+
+body {
+    /* background: linear-gradient(160deg, var(--chess-cell-color), var(--primary-color) 33%); */
+    background-color: var(--primary-color);
+    font-family: 'Montserrat', sans-serif;
+    height: 100vh;
+}
+
+.navbar-brand, .nav-link {
+  display: block;
+  text-align: center;
+}
+
+a{
+    color: white !important;
+}
+
+.main-nav{
+    height: 100vh;
+    background-color: var(--secondary-color);
+    border: 3px solid var(--border-highlight-color);
+    /* margin-left: 13px; */
+}
+
+
+/* ////////////////////////////////// */
+
+.chessboard {
+    width: min(75vh,75vh);
+    height: min(75vh,75vh);
+    background-color: var(--chess-cell-color);
+    margin-left: auto;
+    display: grid;
+    grid-template-columns: repeat(8,1fr);
+}
+
+.black {
+    background-color: var(--chess-cell2-color);
+}
+.white {
+    background-color: var(--chess-cell-color);
+}

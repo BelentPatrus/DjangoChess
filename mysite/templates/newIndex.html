@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/newmaster.css' %}">
+
+{% endblock css %}
+{% block content %}
+<!DOCTYPE html>
+<div class="container-fluid h-100">
+    <div class="row no-gutters h-100">
+        <nav class="col-3 col-xl-2 main-nav navbar navbar-expand-lg bg-body-tertiary d-flex flex-column justify-content-between">
+            <div class="main-nav--options w-100">
+
+                <ul class="navbar-nav flex-column w-100">
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="#">LOGO</a>
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link active" aria-current="page" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="#">Play</a>
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="#">Friends</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="main-nav--utilities w-100">
+                 <ul class="navbar-nav flex-column w-100">
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="#">Settings</a>
+                    </li>
+                    <li class="nav-item text-center">
+                        <a class="nav-link active disabled" aria-current="page" href="#">Collapse</a>
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+        <div class="game col-9 col-xl-10">
+            <div class="d-flex p-2 justify-content-center">
+                <div class="chessboard">
+                    {% for nums in range %}
+                        {% if forloop.counter|divisibleby:2 %}
+                            {% for num in range %}
+                                {% if forloop.counter|divisibleby:2 %}
+                                    <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                                {% else %}
+                                    <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for num in range %}
+                                {% if forloop.counter|divisibleby:2 %}
+                                    <div id="{{ nums }}-{{ num }}" class="white chess-cell"></div>
+                                {% else %}
+                                    <div id="{{ nums }}-{{ num }}" class="black chess-cell"></div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+    
+                <div class="chat m-3">
+                    <textarea id="chat-log" cols="50" rows="20"></textarea><br />
+                    <input id="chat-message-input" type="text" size="45" /><br />
+                    <input id="chat-message-submit" type="button" value="Send" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
