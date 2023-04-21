@@ -3,6 +3,10 @@
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/chessboard.css' %}">
 {% endblock css %}
+{% block js %}
+<script  src="{% static 'js/chessboard.js' %}"></script>
+<script  src="{% static 'js/game.js' %}"></script>
+{% endblock js %}
 {% block content %}
     <nav class="navbar navbar-expand-lg navbar-tasks ">
         <div class="container-fluid">
@@ -38,295 +42,22 @@
             {% endif %}
         {% endfor %}
     </div>
-    <script type="text/javascript">
-        // GLOBAL VARIABLES
-        var elements = document.getElementsByClassName("chess-cell");
-        var startGameBtn = document.getElementById('startgamebtn');
-        var chessboardFE = document.querySelector('.chessboard');
-        userClicks = [];
-        gameStateId = -1;
-        PIECE = {
-            P:'♙', R:'♖', N:'♘', B:'♗', Q:'♕', K:'♔',
-            p:'♟', r:'♜', n:'♞', b:'♝', q:'♛', k:'♚',
-        };
+    <script >
+        const startGameBtn = document.getElementById("startgamebtn");
+        const chessboard = new Chessboard();
+        const game = new Game(chessboard);
+        const processClickUrl = "{% url 'processClick' %}";
 
+        document.addEventListener("click", function(event) {
+            game.setupEventListener(event);
+        });
 
-        document.addEventListener('click', function(event){
-            if(event.target.closest('.chess-cell')){
-                cellID = event.target.id.split('-');
-                cellID[0] = parseInt(cellID[0]);
-                cellID[1] = parseInt(cellID[1]);
-                // Clicked same piece as before
-                if(userClicks.length == 1 && cellID[0] === userClicks[0][0] && cellID[1] === userClicks[0][1]){
-                    console.log('Clicked same piece as before userClicks: '+ userClicks+' eventClick: '+cellID);
-                    return;
-                }
-                userClicks.push(cellID);
-                //Check if only a empty cell was clicked
-                let testID = document.getElementById(event.target.id);
-                if(userClicks.length == 1 &&  !isPiece(testID)){
-                    userClicks = [];
-                    return;
-                }
-                chessBoardClicked(userClicks);
-            }
-        })
-
-        var isPiece = function(cellDiv){
-            /*
-                args: chess cell.
-                return: true or false, chess piece cell or empty.
-            */
-            console.log(cellDiv.childNodes);
-            const childDiv = cellDiv.firstElementChild;
-            if(childDiv.hasAttribute('id')){
-                return true;
-            }
-            return false;
-        }
-
-        //display chess peice location (div id)
-        var myFunction = function(btn) {
-            console.log(btn.currentTarget.id);
-        };
-
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].addEventListener('click', myFunction, false);
-        }
-
-
-        // renders new board for html
-        var renderBoard = function(){
-            console.log("================================Entering renderBoard==================================");
-            var url = 'http://127.0.0.1:8000/chess/latestBoard/' + gameStateId;
-            fetch(url)
-            .then((resp) => resp.json())
-            .then(function(data){
-                processBoard(data, false)
-            })
-            console.log("================================Exiting renderBoard==================================");
-
-        }
-
-
-        // helper function for render board
-        var processBoard = function(data, freshBoardFlag=true){
-            console.log("================================Entering processBoard==================================");
-
-            jsonData = JSON.parse(data.chessboard);
-            if(freshBoardFlag){
-                gameStateId = JSON.parse(data.gameState);
-                console.log("=========================GAMESTATEID====================================");
-                console.log(gameStateId);
-                console.log("=========================GAMESTATEID====================================");
-
-                chessboardFE.setAttribute('id',gameStateId.toString());
-
-            }
-            else{
-                gameStateId = data['gameState'];
-                chessboardFE.setAttribute('id',gameStateId.toString());
-
-            }
-
-            for (var i = 0; i < 64; i++) {
-                let element = elements[i];
-                while (element.firstChild) {
-                    element.removeChild(element.firstChild);
-                }
-                var div = document.createElement("Div"); 
-                    
-                type = jsonData[i].type.toLowerCase();
-                team = jsonData[i].team.toLowerCase();
-                console.log("This is the type -- " + type);
-                if(type.toLowerCase() == "rook"){
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.R);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.r);
-                    }
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-                }
-                else if(type.toLowerCase() == "bishop"){
-
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.B);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.b);
-                    }
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-
-                    
-
-
-                }
-                else if(type.toLowerCase() == "knight"){
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.N);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.n);
-                    }
-
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-
-
-                }
-                else if(type.toLowerCase() == "queen"){
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.Q);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.q);
-                    }
-
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-
-
-                }
-                else if(type.toLowerCase() == "king"){
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.K);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.k);
-                    }
-
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-
-
-                }
-                else if(type.toLowerCase() == "pawn"){
-                    if(team == "white"){
-                        txt = document.createTextNode(PIECE.P);
-
-                    }
-                    else{
-
-                        txt = document.createTextNode(PIECE.p);
-                    }
-
-
-                    div.appendChild(txt);
-                    div.id = elements[i].id;
-
-
-                }
-                    //  var src = document.getElementById("1-1"); 
-                    
-                    //    src.appendChild(img);
-                elements[i].appendChild(div)
-
-            }
-
-            console.log("================================Exiting processBoard==================================");
-
-        }
-
-
-        // start operations when new game is created
-        var startGame = function(){
-
+        startGameBtn.addEventListener("click", function(event){
+            game.startGame()
             
-
-            var url = 'http://127.0.0.1:8000/chess/getData/'
-
-            fetch(url)
-            .then((resp) => resp.json())
-            .then(function(data){
-                processBoard(data)
-            })
-        } 
-        
-        startGameBtn.addEventListener("click",startGame);
-
-
-        // chess board clicked
-        var chessBoardClicked = async function(clicks){
-            /*
-                args: userClicks Global Array
-                Deals with the clicking events in python and based on that result does an operation:
-                    - highlighing cells
-                    - moves a chess piece
-            */
-            var url = "{% url 'processClick' %}"
-            var token = "{{ csrf_token }}"
-            const obj = {
-                cords: JSON.stringify(clicks),
-                gameState: gameStateId.toString()
-            };
-            try {
-                let res = await fetch(url,{
-                    method: 'POST',
-                    headers: {
-                        'Content-type':'application/json',
-                        'X-CSRFToken' : token,
-                    },
-                    body: JSON.stringify(obj)
-                })
-                let data = await res.json();
-                console.log(data);
-                if(data['sameTeam']){
-                    userClicks[0] = userClicks[1];
-                    userClicks.splice(1,1);
-                    chessBoardClicked(userClicks);
-                }else if(data['Operation'] === 'highlight'){
-                    movesetHighlighter(data['moveSet']);
-                }else if(data['Operation'] === 'move'){
-                    removeHighlight();
-                    renderBoard();
-                    userClicks = [];
-                }
-                console.log('End of click event handler | userClicks: ' + userClicks + ' Data: ' + data);
-
-            }catch(err){
-                console.log('Error: '+err);
-            }
-        }
-            
-        var movesetHighlighter = async function(highlightCords){
-            /* 
-                args: list of cordinates in 2d array
-                action: removes previous highlighting and adds highlight css to the args
-            */
-            removeHighlight();
-            highlightCords.forEach((item) =>{
-                var id = item[0]+"-"+item[1]
-                var cell = document.getElementById(id)
-                cell.classList.add('highlight-move')
-            })
-        }
-        var removeHighlight = function(){
-            /*
-                action: removes all highlighting on the board
-            */
-            var elements = document.querySelectorAll('.highlight-move');
-            elements.forEach((cell)=>{
-                cell.classList.remove('highlight-move');
-            })
-        }
+        });
 
     </script>
+    
+   
 {% endblock content %}
