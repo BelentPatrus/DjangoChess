@@ -89,6 +89,7 @@ def chessMatch(request, match_id):
     rangeset = range(1, 9)
     context = {
         "range": rangeset,
+        'match_id' : match_id
     }
     return render(request, 'chessMatch.html', context)
 

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'chessengine',
+    'corechannels',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +125,13 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 
 ]
+
+ASGI_APPLICATION = "mysite.routing.application"
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 
 # Default primary key field type

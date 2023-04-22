@@ -6,6 +6,14 @@ def index(request):
 
     return render(request, 'index.html')
 
+def newIndex(request):
+    rangeset = range(1, 9)
+    context = {
+        "range": rangeset,
+    }
+
+    return render(request, 'newIndex.html', context)
+
 
 def stats(request):
 
