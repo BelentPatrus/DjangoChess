@@ -16,6 +16,9 @@
                         <a class="nav-link" href="#">LOGO</a>
                     </li>
                     <li class="nav-item text-center">
+                        <a class="nav-link" id="loginButton" href="#">Login</a>
+                    </li>
+                    <li class="nav-item text-center">
                         <a class="nav-link active" aria-current="page" href="#">Profile</a>
                     </li>
                     <li class="nav-item text-center">
@@ -87,6 +90,67 @@
         </div>
     </div>
 </div>
+<div class="popup-login">
+    <div class="popup-content">
+        <div class="close-button">&times;</div>
+        <h2>Login</h2>
+        <div class="form-element">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter Username">
+        </div>
+        <div class="form-element">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter Password">
+        </div>
+        <div class="form-element">
+            <button>Sign In</button>
+        </div>
+        <div class="form-element">
+            <a id="registerButton" href="#">Register</a>
+        </div>
+    </div>
+</div>
+<div class="popup-register">
+    <div class="popup-content">
+        <div class="close-button">&times;</div>
+        <h2>Register</h2>
+        <div class="form-element">
+            <label for="reg-username">Username:</label>
+            <input type="text" id="reg-username" placeholder="Enter Username">
+        </div>
+        <div class="form-element">
+            <label for="reg-password">Password:</label>
+            <input type="password" id="reg-password" placeholder="Enter Password">
+        </div>
+            <div class="form-element">
+                <label for="Cpassword">Confirm Password:</label>
+                <input type="password" id="Cpassword" placeholder="Comfirm Password">
+            </div>
+        <div class="form-element">
+            <button>Sign Up</button>
+        </div>
+    </div>
+</div>
 
+<script>
+    //login open event
+    document.getElementById("loginButton").addEventListener("click", function(){
+        document.querySelector(".popup-login").style.display = "flex";
+    });
+    //login close event
+    document.querySelector('.popup-login .popup-content .close-button').addEventListener("click", function(){
+        document.querySelector(".popup-login").style.display = "none";
+    });
+    //register open event
+    document.getElementById("registerButton").addEventListener("click", function(){
+        document.querySelector(".popup-login").style.display="none";
+        document.querySelector(".popup-register").style.display= "flex";
+    })
+    //register close event
+    document.querySelector(".popup-register .popup-content .close-button").addEventListener("click", function(){
+        document.querySelector(".popup-register").style.display="none";
+        document.querySelector(".popup-login").style.display="flex";
+    });
+</script>
 {% endblock content %}
 
