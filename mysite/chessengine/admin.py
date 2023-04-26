@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ChessboardModel, GameStateModel, ChessBoardMove
+from .models import ChessBoardModel, GameStateModel, ChessBoardMove
 # Register your models here.
 
 
@@ -13,6 +13,6 @@ def getGameStateId(obj):
     return obj.id
 
 
-@admin.register(ChessboardModel)
+@admin.register(ChessBoardModel)
 class chessboardModelAdmin(admin.ModelAdmin):
     list_display = [getGameStateId, "playerTurn", "date"]

@@ -8,7 +8,7 @@ class GameStateModel(models.Model):
     totalMoves = models.PositiveSmallIntegerField(default=0)
 
 
-class ChessboardModel(models.Model):
+class ChessBoardModel(models.Model):
     chessboard = models.JSONField()
     date = models.DateTimeField(auto_now=True)
     playerTurn = models.TextField(max_length=15)
