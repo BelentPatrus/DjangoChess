@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ChessBoardModel, ChessBoardMove
+from .models import ChessBoardModel, ChessMoveModel
 
 
 class ChessboardSerializer(serializers.ModelSerializer):
@@ -10,5 +10,5 @@ class ChessboardSerializer(serializers.ModelSerializer):
 
 class ChessBoardMoveSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ChessBoardMove
+        model = ChessMoveModel
         fields = '__all__'
