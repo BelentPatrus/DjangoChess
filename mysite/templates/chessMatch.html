@@ -2,7 +2,9 @@
 {% load static %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/chessboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/master.css' %}">
 {% endblock css %}
+
 {% block js %}
 <script  src="{% static 'js/chessboard.js' %}"></script>
 <script  src="{% static 'js/game.js' %}"></script>
@@ -54,6 +56,7 @@
 
     <script >
         const processClickUrl = "{% url 'processClick' %}";
+        const token = "{{ csrf_token }}";
         const roomName = JSON.parse(document.getElementById("room-name").textContent);
         const playerSocket = new WebSocket("ws://" + window.location.host + "/ws/chess/match/" + roomName + "/");
 

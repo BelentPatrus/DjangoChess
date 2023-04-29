@@ -1,10 +1,10 @@
-class Game  {
-     constructor(Chessboard) {
-        this.userClicks = [];
-        this.chessboard = Chessboard;
-     }
+class Game {
+  constructor(Chessboard) {
+    this.userClicks = [];
+    this.chessboard = Chessboard;
+  }
 
-   isPiece(cellDiv) {
+  isPiece(cellDiv) {
     /*
                 args: chess cell.
                 return: true or false, chess piece cell or empty.
@@ -13,7 +13,7 @@ class Game  {
     if (childDiv.hasAttribute("id")) return true;
     return false;
   }
-  async startGame(){
+  async startGame() {
     // game logic
     var url = "http://127.0.0.1:8000/chess/getData/";
     const response = await fetch(url);
@@ -21,7 +21,7 @@ class Game  {
     this.chessboard.processBoard(data);
   }
 
-  async setupEventListener(event)  {
+  async setupEventListener(event) {
     // chessboard logic
     if (event.target.closest(".chess-cell")) {
       let cellID = event.target.id.split("-");
@@ -48,12 +48,9 @@ class Game  {
         this.userClicks = [];
         return;
       }
-       this.userClicks = await this.chessboard.chessBoardClicked(
-         this.userClicks
-       );
+      this.userClicks = await this.chessboard.chessBoardClicked(
+        this.userClicks
+      );
     }
   }
-
-};
-
-
+}

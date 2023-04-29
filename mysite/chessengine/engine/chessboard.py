@@ -1,7 +1,7 @@
 
 import json
 
-
+from .Pieces.FEN import FEN
 from .Pieces.rook import Rook
 from .Pieces.bishop import Bishop
 from .Pieces.queen import Queen
@@ -48,7 +48,10 @@ class Chessboard:
         else:
             self.board = []
             for p in chessBoardModel:
-                if p['type'] == Pieces.BISHOP:
+                p = FEN.decryptFEN(self, p)
+                if p == None:
+                    continue
+                elif p['type'] == Pieces.BISHOP:
                     tmp = Bishop(p['team'], Pieces.BISHOP)
                 elif p['type'] == Pieces.PAWN:
                     tmp = Pawn(p['team'], Pieces.PAWN)
@@ -98,7 +101,7 @@ class Chessboard:
             nextRow, nextCol = next[0], next[1]
             # print('In valid if statement changing the pieces position to {},{}'.format(nextRow, nextCol))
             self.board[nextRow][nextCol] = self.board[row][col]
-            self.board[row][col] = Empty("Empty", Pieces.EMPTY)
+            self.board[row][col] = Empty(TeamSideE.EMPTY, Pieces.EMPTY)
             print('Made move to [{},{}]'.format(nextRow, nextCol))
             self.toggleTurn()
 
@@ -115,8 +118,9 @@ class Chessboard:
         for row in self.board:
             for p in row:
                 chessboardSerialized.append(p.getJSONDict())
+            chessboardSerialized.append("/")
 
-        return chessboardSerialized
+        return ('').join(chessboardSerialized)
 
     def toggleTurn(self):
         self.playerTurn = TeamSideE.BLACK if self.playerTurn == TeamSideE.WHITE else TeamSideE.WHITE

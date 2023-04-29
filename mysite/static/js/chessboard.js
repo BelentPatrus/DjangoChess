@@ -15,7 +15,7 @@ class Chessboard {
   }
 
   processBoard(data, freshBoardFlag = true) {
-    let jsonData = JSON.parse(data.chessboard);
+    let jsonBoardData = JSON.parse(data.chessboard).replace(/\//g, "");
     this.gameStateId = freshBoardFlag
       ? (this.gameStateId = JSON.parse(data.gameState))
       : (this.gameStateId = data["gameState"]);
@@ -25,8 +25,9 @@ class Chessboard {
       while (element.firstChild) {
         element.removeChild(element.firstChild);
       }
-      let type = jsonData[i].type.toLowerCase();
-      let team = jsonData[i].team.toLowerCase();
+      let pieceToRender = jsonBoardData[i];
+      let type = FENKEY[pieceToRender].type.toLowerCase();
+      let team = FENKEY[pieceToRender].team.toLowerCase();
 
       if (type in PIECEMAP) {
         const txt = document.createTextNode(PIECEMAP[type][team]);
@@ -69,7 +70,7 @@ class Chessboard {
                     - moves a chess piece
             */
     var url = processClickUrl;
-    var token = "{{ csrf_token }}";
+
     const obj = {
       cords: JSON.stringify(clicks),
       gameState: this.gameStateId.toString(),
@@ -97,20 +98,14 @@ class Chessboard {
         clicks = [];
       }
       console.log(
-        "End of click event handler | userClicks: " +
-          clicks +
-          " Data: " +
-          data
+        "End of click event handler | userClicks: " + clicks + " Data: " + data
       );
     } catch (err) {
-       console.error(`Error: ${err.message}\nStack trace:\n${err.stack}`);
+      console.error(`Error: ${err.message}\nStack trace:\n${err.stack}`);
     }
     return clicks;
-
   }
-};
-
-
+}
 
 //display chess peice location (div id)
 // var myFunction = function (btn) {
