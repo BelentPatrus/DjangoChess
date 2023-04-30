@@ -7,14 +7,24 @@ class Chessboard {
 
   // renders new board for html
   async renderBoardREST() {
+    // HERE IS THE TRIGGER POINT FOR CHANNEL
     //RESTful get board
     var url = "http://127.0.0.1:8000/chess/latestBoard/" + this.gameStateId;
     const response = await fetch(url);
     const data = await response.json();
+    this.sendBoardToOpponent(data);
     this.processBoard(data, false);
+  }
+  sendBoardToOpponent(data) {
+     playerGameSocket.send(
+       JSON.stringify({
+         gamedata: data,
+       })
+     );
   }
 
   processBoard(data, freshBoardFlag = true) {
+    //POINT OF ATTACK
     let jsonBoardData = JSON.parse(data.chessboard).replace(/\//g, "");
     this.gameStateId = freshBoardFlag
       ? (this.gameStateId = JSON.parse(data.gameState))
