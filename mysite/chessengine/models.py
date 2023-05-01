@@ -8,14 +8,14 @@ class GameStateModel(models.Model):
     totalMoves = models.PositiveSmallIntegerField(default=0)
 
 
-class ChessboardModel(models.Model):
+class ChessBoardModel(models.Model):
     chessboard = models.JSONField()
     date = models.DateTimeField(auto_now=True)
     playerTurn = models.TextField(max_length=15)
     gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE)
 
 
-class ChessBoardMove(models.Model):
+class ChessMoveModel(models.Model):
     cords = models.JSONField()
     result = models.TextField(null=True)
     date = models.DateTimeField(auto_now=True)

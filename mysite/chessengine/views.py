@@ -5,7 +5,7 @@ from chessengine.engine.Pieces.empty import Empty
 from django.contrib.auth import authenticate, login
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import ChessboardModel, GameStateModel
+from .models import ChessBoardModel, GameStateModel
 from .serializers import ChessboardSerializer, ChessBoardMoveSerializer
 from .engine.chessboard import Chessboard
 from .engine.TeamSideE import TeamSideE
@@ -50,6 +50,7 @@ def logout(request):
     return redirect('login')
 @api_view(["GET"])
 def getLatestChessBoardData(request, gameStateId):
+
     data = ChessboardModel.objects.all().filter(gameState=gameStateId).latest("date")
     serializer = ChessboardSerializer(data, many=False)
     return Response(serializer.data)
@@ -69,6 +70,7 @@ def getData(request):
 
     chessboardData.save()
     data = ChessboardModel.objects.filter(gameState=gameStateData).latest("date")
+
     serializer = ChessboardSerializer(data, many=False)
 
     return Response(serializer.data)
@@ -87,10 +89,12 @@ def twoPointMove(request):
         # get cur and next arrays
         # check if valid move
 
+
         gameStateId = serializer.validated_data.get("gameState")
         chessboardModelData = (
             ChessboardModel.objects.all().filter(gameState=gameStateId).latest("date")
         )
+        
         playerTurn = chessboardModelData.playerTurn
         chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
         cur = json.loads(serializer.validated_data.get("cords"))[0]
@@ -106,6 +110,7 @@ def twoPointMove(request):
         ):
             data["sameTeam"] = True
         elif chessboard.movePiece(cur, next):
+
             chessboardData = ChessboardModel(
                 chessboard=json.dumps(chessboard.getJSONDict()),
                 gameState=gameStateId,
@@ -128,7 +133,6 @@ def chessMatch(request, match_id):
     context = {"range": rangeset, "match_id": match_id}
     return render(request, "chessMatch.html", context)
 
-
 def lobby(request):
     rangeset = range(1, 9)
     context = {
@@ -137,7 +141,8 @@ def lobby(request):
     return render(request, "lobby.html", context)
 
 
-@api_view(["GET", "POST"])
+
+@api_view(['GET', 'POST'])
 def processClick(request):
     """
     This function will process the click of a user determining which action to take regarding these situations:
@@ -180,4 +185,5 @@ def getAvailableMoves(request):
             move[i] += 1
         moveSetList.append(move)
     data = {"moveSet": moveSetList}
+
     return data

@@ -11,7 +11,7 @@ from .Pieces.pawn import Pawn
 from .Pieces.empty import Empty
 from .Pieces.Pieces import Pieces
 from .TeamSideE import TeamSideE
-from ..models import ChessboardModel
+from ..models import ChessBoardModel
 from .Pieces.piece import Piece
 
 
@@ -104,7 +104,6 @@ class Chessboard:
 
         print("PLAYER TURN IS NOW " + self.playerTurn)
         return isValid
-
 
     def getPieceMoves(self, position):
         return self.board[position[0]][position[1]].validMoves(self.board, position)
