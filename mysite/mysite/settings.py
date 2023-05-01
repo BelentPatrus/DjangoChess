@@ -138,3 +138,9 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Login url redirection
+LOGIN_REDIRECT_URL = None
+
+LOGIN_URL = '/users/login'

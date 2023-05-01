@@ -1,0 +1,31 @@
+{% extends 'chessengine/base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+{% endblock css %}
+{% block title %}Login{% endblock title%}
+{% block content %}
+<div class="background-registration">
+    <div class="main">
+        <div class="content">
+            <h2>Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-element">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+                {% endfor %}
+                <div class="form-element">
+                    <button type="submit">Sign In</button>
+                </div>
+                <div class="form-element">
+                    <a id="registerButton" href="/chess/sign-up">Register</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

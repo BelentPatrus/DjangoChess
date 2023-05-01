@@ -17,16 +17,15 @@ from . import views
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib import staticfiles
+from django.contrib.auth.decorators import login_required
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.index, name="index"),
-    path('new/', views.newIndex, name="index"),
-
-    path('stats/', views.stats, name="stats"),
-    path('settings/', views.settings, name="settings"),
-
-    path('chess/', include('chessengine.urls'))
-
+    path("admin/", admin.site.urls),
+    path("", views.index, name="index"),
+    path("new/", login_required(views.newIndex), name="newIndex"),
+    path("stats/", views.stats, name="stats"),
+    path("settings/", views.settings, name="settings"),
+    path("chess/", include("chessengine.urls")),
+    path("users/", include("django.contrib.auth.urls")),
 ]
