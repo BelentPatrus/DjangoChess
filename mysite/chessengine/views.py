@@ -12,22 +12,20 @@ from .engine.TeamSideE import TeamSideE
 from .forms import RegisterForm, LoginForm
 import json
 
-# Create your views here.
 
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
-        if form.is_valid(): 
+        if form.is_valid():
             user = form.get_user()
             login(request, user)
             return redirect("/new")
     else:
         form = LoginForm()
 
-    context={
-        'form': form
-    }
-    return render(request, 'registration/login.html', context)
+    context = {"form": form}
+    return render(request, "registration/login.html", context)
+
 
 def register_view(request):
     if request.method == "POST":
@@ -40,18 +38,18 @@ def register_view(request):
             return redirect("/new")
     else:
         form = RegisterForm()
-    context = {
-        "form" : form
-    }
-    return render(request, 'registration/sign_up.html', context)
- 
+    context = {"form": form}
+    return render(request, "registration/sign_up.html", context)
+
+
 def logout(request):
     logout(request)
-    return redirect('login')
+    return redirect("login")
+
+
 @api_view(["GET"])
 def getLatestChessBoardData(request, gameStateId):
-
-    data = ChessboardModel.objects.all().filter(gameState=gameStateId).latest("date")
+    data = ChessBoardModel.objects.all().filter(gameState=gameStateId).latest("date")
     serializer = ChessboardSerializer(data, many=False)
     return Response(serializer.data)
 
@@ -64,12 +62,12 @@ def getData(request):
 
     result = json.dumps(startBoard.getJSONDict())
 
-    chessboardData = ChessboardModel(
+    chessboardData = ChessBoardModel(
         chessboard=result, gameState=gameStateData, playerTurn=TeamSideE.WHITE
     )
 
     chessboardData.save()
-    data = ChessboardModel.objects.filter(gameState=gameStateData).latest("date")
+    data = ChessBoardModel.objects.filter(gameState=gameStateData).latest("date")
 
     serializer = ChessboardSerializer(data, many=False)
 
@@ -89,12 +87,11 @@ def twoPointMove(request):
         # get cur and next arrays
         # check if valid move
 
-
         gameStateId = serializer.validated_data.get("gameState")
         chessboardModelData = (
-            ChessboardModel.objects.all().filter(gameState=gameStateId).latest("date")
+            ChessBoardModel.objects.all().filter(gameState=gameStateId).latest("date")
         )
-        
+
         playerTurn = chessboardModelData.playerTurn
         chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
         cur = json.loads(serializer.validated_data.get("cords"))[0]
@@ -110,8 +107,7 @@ def twoPointMove(request):
         ):
             data["sameTeam"] = True
         elif chessboard.movePiece(cur, next):
-
-            chessboardData = ChessboardModel(
+            chessboardData = ChessBoardModel(
                 chessboard=json.dumps(chessboard.getJSONDict()),
                 gameState=gameStateId,
                 playerTurn=chessboard.playerTurn,
@@ -133,6 +129,7 @@ def chessMatch(request, match_id):
     context = {"range": rangeset, "match_id": match_id}
     return render(request, "chessMatch.html", context)
 
+
 def lobby(request):
     rangeset = range(1, 9)
     context = {
@@ -141,8 +138,7 @@ def lobby(request):
     return render(request, "lobby.html", context)
 
 
-
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def processClick(request):
     """
     This function will process the click of a user determining which action to take regarding these situations:
@@ -170,7 +166,7 @@ def getAvailableMoves(request):
 
     gameStateId = request.data["gameState"]
     chessboardModelData = (
-        ChessboardModel.objects.all().filter(gameState=gameStateId).latest("date")
+        ChessBoardModel.objects.all().filter(gameState=gameStateId).latest("date")
     )
     playerTurn = chessboardModelData.playerTurn
     chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
