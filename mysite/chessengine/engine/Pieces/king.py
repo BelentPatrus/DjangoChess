@@ -9,7 +9,7 @@ class King(Piece):
         moves = []
         row, col = position[0], position[1]
         pieceTeam = board[row][col].team.lower()
-        
+
         # white: up, black: down
         if row-1 >= 0 and board[row-1][col].team.lower() != pieceTeam:
             # print('piece team: {}, board piece team: {}'.format(board[row-1][col].team.lower(), pieceTeam))
@@ -21,20 +21,18 @@ class King(Piece):
             # print('piece team: {}, board piece team: {}'.format(board[row+1][col].team.lower(), pieceTeam))
             # print('valid Move d :{}'.format((row+1,col)))
             moves.append((row+1,col))
-        
+
         # white: right, black: left
         if col+1 < 8 and board[row][col+1].team.lower() != pieceTeam:
             # print('piece team: {}, board piece team: {}'.format(board[row][col+1].team.lower(), pieceTeam))
             # print('valid Move r :{}'.format((row,col+1)))
             moves.append((row, col+1))
 
-        
         # white: left, black: right
         if col-1 >= 0 and board[row][col-1].team.lower() != pieceTeam:
             # print('piece team: {}, board piece team: {}'.format(board[row][col-1].team.lower(), pieceTeam))
             # print('valid Move r :{}'.format((row,col-1)))
             moves.append((row, col-1))
-
 
         # white: up-right diagonal, black: down-left diagonal
         if row-1 >= 0 and col+1 < 8 and board[row-1][col+1].team.lower() != pieceTeam:
@@ -48,7 +46,6 @@ class King(Piece):
             # print('valid Move u-l: {}'.format((row-1,col-1)))
             moves.append((row-1,col-1))
 
-        
         # white: down-right diagonal, black: up-left diagonal
         if row+1 < 8 and col+1 < 8 and board[row+1][col+1].team.lower() != pieceTeam:
             # print('board piece team: {}, piece team: {}'.format(board[row+1][col+1].team.lower(), pieceTeam))
@@ -60,6 +57,6 @@ class King(Piece):
             # print('piece team: {}, board piece team: {}'.format(board[row+1][col-1].team.lower(), pieceTeam))
             # print('valid Move d-l: {}'.format((row+1,col-1)))
             moves.append((row+1, col-1))
-        
+
         print('Moves available for KING at [{},{}]: {}'.format(row,col,moves))
         return moves

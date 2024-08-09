@@ -6,4 +6,4 @@ class Empty(Piece):
         super().__init__(team, type)
 
     def validMoves(self, board, position):
-        return None
+        return []

@@ -10,13 +10,17 @@ class GameStateModel(models.Model):
 
 class ChessBoardModel(models.Model):
     chessboard = models.JSONField()
+    moveDict = models.JSONField(null=True)
     date = models.DateTimeField(auto_now=True)
     playerTurn = models.TextField(max_length=15)
     gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE)
 
 
 class ChessMoveModel(models.Model):
-    cords = models.JSONField()
-    result = models.TextField(null=True)
-    date = models.DateTimeField(auto_now=True)
-    gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE)
+    piece = models.JSONField(default=None) # team: WHITE, type: ROOK
+    move = models.JSONField(default=None) # [1,2]
+    position = models.JSONField(default=None)  # [0,2]
+    pieceTaken = models.JSONField(default=None) # None or team: BLACK, type: PAWN
+    result = models.TextField(null=True) # MOVE,TAKE,CASTLE, EN PASSANT
+    date = models.DateTimeField(auto_now=True) # Keep track of order
+    gameState = models.ForeignKey(GameStateModel, on_delete=models.CASCADE) # search in relation to which game

@@ -25,4 +25,4 @@ class GameStateModelAdmin(admin.ModelAdmin):
 
 @admin.register(ChessMoveModel)
 class ChessMoveModelAdmin(admin.ModelAdmin):
-    list_display = [getGameStateId, "cords", "result", "date"]
+    list_display = [getGameStateId, "position", "move", "result", "date"]
