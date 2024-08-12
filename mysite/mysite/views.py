@@ -1,18 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib.auth import logout
 
 def index(request):
-
-    return render(request, 'index.html')
-
-def newIndex(request):
     rangeset = range(1, 9)
     context = {
         "range": rangeset,
     }
 
-    return render(request, 'newIndex.html', context)
+    return render(request, 'index.html', context)
 
 
 def stats(request):

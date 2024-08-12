@@ -22,10 +22,10 @@ from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.index, name="index"),
-    path("new/", login_required(views.newIndex), name="newIndex"),
+    path("", login_required(views.index), name="index"),
     path("stats/", views.stats, name="stats"),
     path("settings/", views.settings, name="settings"),
     path("chess/", include("chessengine.urls")),
+    path("members/", include("members.urls")),
     path("users/", include("django.contrib.auth.urls")),
 ]

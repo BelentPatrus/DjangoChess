@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'chessengine',
     'corechannels',
+    'members',
 ]
 
 MIDDLEWARE = [
@@ -143,4 +144,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Login url redirection
 LOGIN_REDIRECT_URL = None
 
-LOGIN_URL = '/users/login'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = "index"  # new
