@@ -109,12 +109,11 @@ a {
 
 /* Ensure form and button have no default styling */
 .logout-form {
-  display: inline;
-  /* Ensure the form is inline with the list item */
   margin: 0;
   /* Remove any default margin */
   padding: 0;
   /* Remove any default padding */
+  text-align: center;
 }
 
 .logout-form button {
@@ -130,6 +129,6 @@ a {
   /* Change cursor to pointer for clickable */
   text-align: center;
   /* Center text */
-  color: inherit;
+  color: white;
   /* Inherit text color from parent */
 }
