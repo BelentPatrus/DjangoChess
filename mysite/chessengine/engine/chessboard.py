@@ -13,9 +13,9 @@ from .TeamSideE import TeamSideE
 from ..models import ChessBoardModel
 from ..models import ChessMoveModel
 from .Pieces.piece import Piece
+from ..helper import Helper
 
 from django.db.models import Q
-
 from copy import deepcopy
 
 
@@ -47,6 +47,7 @@ class Chessboard:
                     TeamSideE.WHITE, Pieces.KING), Bishop(TeamSideE.WHITE, Pieces.BISHOP), Knight(TeamSideE.WHITE, Pieces.KNIGHT), Rook(TeamSideE.WHITE, Pieces.ROOK)]
             ]
             self.moveData = {}
+            self.moveDict = {}
             self.playerTurn = playerTurn
             self.gameStateId = None
         else:
@@ -83,26 +84,23 @@ class Chessboard:
             returns: True or False based on if the move is in the moveset calculated to be in the piece's move list.
 
         """
-        # To test comment and make moveInfo = move
-        # moveInfo = json.loads(move)
-        # moveInfo = move
-        # row, col = moveInfo['curr'][0], moveInfo['curr'][1]
         row, col = position[0], position[1]
         selectedP = self.board[row][col]
+        result = {}
         print(self.board[row][col])
         if selectedP.team != self.playerTurn:
             print("NOT YOUR TURN")
-            return False
+            result['isValid'] = False
+            return result
 
         moveSet = self.board[row][col].validMoves(self.board, position)
         print(self.board[row][col].getTeam().value)
         print(self.board[row][col].getType().value)
         posTuple = tuple(position)
 
-        # isValid = False if moveSet is None else tuple(next) in moveSet
-        validMoves = self.getAllValidMoves()
-        isValid = tuple(move) in validMoves[selectedP.getTeam().value][posTuple]
-        if isValid:
+        moveDict = self.getMovesDictQuery()
+        result['isValid'] = move in moveDict[selectedP.getTeam().value][posTuple]
+        if result['isValid']:
 
             nextRow, nextCol = move[0], move[1]
             pieceTaken = self.board[nextRow][nextCol]
@@ -128,6 +126,9 @@ class Chessboard:
                                             'type': self.board[moveData['rookMove'][0]][moveData['rookMove'][1]].getType().value
                                             }
                 self.castle(position, move, moveData['rookPosition'], moveData['rookMove'])
+            elif isinstance(selectedP, Pawn) and pieceTaken.getTeam() == TeamSideE.EMPTY and col != nextCol:
+                moveData['result'] = 'EN PASSANT'
+                self.enPassant(position, move)
             elif pieceTaken.getTeam() == TeamSideE.EMPTY:
                 moveData['result'] = 'MOVE'
                 self.moveOrTake(position, move)
@@ -138,9 +139,12 @@ class Chessboard:
             self.setMoveData(moveData)
 
             self.toggleTurn()
+            # result['moveDict'] = Helper.convert_keys_to_strings(self.getAllValidMoves())
+            print(f"Move piece data: \n{moveData}")
 
         print("PLAYER TURN IS NOW " + self.playerTurn)
-        return isValid
+
+        return result
 
     def moveOrTake(self, position, move):
         self.board[move[0]][move[1]] = self.board[position[0]][position[1]]
@@ -152,6 +156,10 @@ class Chessboard:
 
         self.board[move2[0]][move2[1]] = self.board[position2[0]][position2[1]]
         self.board[position2[0]][position2[1]] = Empty(TeamSideE.EMPTY, Pieces.EMPTY)
+
+    def enPassant(self, position, move):
+        self.moveOrTake(position,move)
+        self.board[position[0]][move[1]] = Empty(TeamSideE.EMPTY, Pieces.EMPTY)
 
     def getAllMovesForPosition(self, team, position):
         return self.getAllValidMoves()[team][tuple(position)]
@@ -206,7 +214,7 @@ class Chessboard:
         if not hasKingMoved and not self.isKingInCheck(self.board, piece.getTeam()):
 
             isUnderAttackLeft, isUnderAttackRight = self.isUnderAttackRightAndLeft(piece.getTeam())
-        
+
             if not hasLeftRookMoved and not isUnderAttackLeft:
 
                 leftCol = 1
@@ -282,6 +290,30 @@ class Chessboard:
 
         return kingMoves
 
+    def getMovesDictQuery(self):
+        try:
+            movesDict = ChessBoardModel.objects.filter(
+                gameState=self.gameStateId,
+            ).values('moveDict').latest('date')
+            movesDict = Helper.convert_keys_to_tuples(movesDict['moveDict'])
+        except ChessBoardModel.DoesNotExist:
+            movesDict = None
+
+        return movesDict
+
+    def updateMovesDictQuery(self):
+        movesDict = self.getAllValidMoves()
+        moveDictConverted = Helper.convert_keys_to_strings(movesDict)
+        result = json.dumps(self.getJSONDict())
+        chessboardData = ChessBoardModel(
+            chessboard=result,
+            moveDict=moveDictConverted,
+            gameState=self.getGameStateId(),
+            playerTurn=self.getPlayerTurn(),
+        )
+        chessboardData.save()
+        return movesDict
+
     def getRooksFirstMoveQuery(self, team):
         position1 = [7,0]
         position2 = [7,7]
@@ -311,8 +343,49 @@ class Chessboard:
         return firstMovePos1, firstMovePos2
 
     def handleEnPassant(self, piece, moves, position):
-        # TODO
+        rowCheck = 4
+        if piece.getTeam() == TeamSideE.WHITE:
+            rowCheck = 3
+        if position[0] != rowCheck:
+            return moves
+        
+        checkRight = False
+        if position[1] < 7:
+            rightPiece = self.board[position[0]][position[1] + 1]
+            if isinstance(rightPiece, Pawn) and rightPiece.getTeam() != piece.getTeam():
+                latestMove = self.getMoveData()['move']
+                if latestMove == [position[0],position[1]+1]:
+                    checkRight = True
+        checkLeft = False
+        if position[1] > 0:
+            leftPiece = self.board[position[0]][position[1] - 1]
+            if isinstance(leftPiece, Pawn) and leftPiece.getTeam() != piece.getTeam():
+                latestMove = self.getMoveData()['move']
+                if latestMove == [position[0], position[1] - 1]:
+                    checkLeft = True
+        
+        if checkRight:
+            if piece.getTeam() == TeamSideE.BLACK:
+                moves.append((position[0] + 1, position[1] + 1)) # down and left in white perspective
+            else:
+                moves.append((position[0] - 1, position[1] + 1)) # up and right in white perspective
+        elif checkLeft:
+            if piece.getTeam() == TeamSideE.BLACK:
+                moves.append((position[0] + 1, position[1] - 1)) # down and right in white perspective
+            else:
+                moves.append((position[0] - 1, position[1] - 1)) # up and left in white perspective
+
         return moves
+
+    def getLatestMoveQuery(self):
+        try:
+            latestMove= ChessMoveModel.objects.filter(
+                gameState=self.getGameStateId()
+            ).earliest("date")
+        except ChessMoveModel.DoesNotExist:
+            latestMove = None
+        
+        return latestMove
 
     def simulateMove(self, move, position):
 
@@ -329,7 +402,7 @@ class Chessboard:
                     position = [row,col]
                     moves.extend(board[row][col].validMoves(board, position))
                 if isinstance(piece, King) and piece.team == player:
-                    kingPos = (row, col)
+                    kingPos = [row, col]
 
         return True if kingPos in moves else False
 
@@ -368,3 +441,12 @@ class Chessboard:
 
     def getGameStateId(self):
         return self.gameStateId
+
+    def getMoveDict(self):
+        return self.moveDict
+
+    def setMoveDict(self, moveDict):
+        self.moveDict = moveDict
+
+    def getPlayerTurn(self):
+        return self.playerTurn

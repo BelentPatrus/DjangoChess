@@ -10,6 +10,7 @@ from .serializers import ChessboardSerializer, ChessBoardMoveSerializer
 from .engine.chessboard import Chessboard
 from .engine.TeamSideE import TeamSideE
 from .forms import RegisterForm, LoginForm
+from .helper import Helper
 import json
 
 
@@ -59,16 +60,17 @@ def getData(request):
     gameStateData = GameStateModel.objects.create()
 
     startBoard = Chessboard()
+    movesDict = startBoard.getAllValidMoves()
+    moveDictConverted = Helper.convert_keys_to_strings(movesDict)
 
     result = json.dumps(startBoard.getJSONDict())
 
     chessboardData = ChessBoardModel(
-        chessboard=result, gameState=gameStateData, playerTurn=TeamSideE.WHITE
+        chessboard=result, moveDict=moveDictConverted, gameState=gameStateData, playerTurn=TeamSideE.WHITE
     )
 
     chessboardData.save()
     data = ChessBoardModel.objects.filter(gameState=gameStateData).latest("date")
-
     serializer = ChessboardSerializer(data, many=False)
     print(serializer.data)
 
@@ -78,15 +80,9 @@ def getData(request):
 def twoPointMove(request):
     data = {}
     serializer = ChessBoardMoveSerializer(data=request.data)
-    # what i need is to query this data to find latest chessboard related to this datas foreign key
     if serializer.is_valid():
         print("======================serial data============================")
         print(serializer.validated_data)
-        # get gamestate id
-        # get latest gameboard
-        # create ChhessBoard based on latest
-        # get cur and next arrays
-        # check if valid move
 
         gameStateId = serializer.validated_data.get("gameState")
         chessboardModelData = (
@@ -109,12 +105,12 @@ def twoPointMove(request):
             == chessboard.board[move[0]][move[1]].team.lower()
         ):
             data["sameTeam"] = True
-        elif chessboard.movePiece(position, move):
-            chessboardData = ChessBoardModel(
-                chessboard=json.dumps(chessboard.getJSONDict()),
-                gameState=gameStateId,
-                playerTurn=chessboard.playerTurn,
-            )
+            data["data"] = serializer.data
+            return data
+
+        movePieceResult = chessboard.movePiece(position, move)
+
+        if movePieceResult['isValid']:
 
             validatedData = serializer.validated_data
             moveData = chessboard.getMoveData()
@@ -140,8 +136,21 @@ def twoPointMove(request):
                 chessMoveDataRook.save()
             else:
                 validatedData.update(moveData)
-                serializer.save()
+                try:
+                    serializer.is_valid()
+                    serializer.save()
+                except Exception:
+                    print(f"serializer didn't save properly: \n{Exception}")
 
+
+            moveDict = Helper.convert_keys_to_strings(chessboard.getAllValidMoves())
+
+            chessboardData = ChessBoardModel(
+                chessboard=json.dumps(chessboard.getJSONDict()),
+                gameState=gameStateId,
+                playerTurn=chessboard.getPlayerTurn(),
+                moveDict=moveDict,
+            )
             chessboardData.save()
 
             data["sameTeam"] = False
@@ -149,7 +158,7 @@ def twoPointMove(request):
     else:
         print(request.data)
         print(serializer.errors)
-        print("here")
+
     data["data"] = serializer.data
     return data
 
@@ -190,7 +199,6 @@ def processClick(request):
         f"ProcessClick: {request.data}"
     )
 
-
 def getAvailableMoves(request):
     # Get available moves for the chess piece in question
 
@@ -198,6 +206,7 @@ def getAvailableMoves(request):
     chessboardModelData = (
         ChessBoardModel.objects.all().filter(gameState=gameStateId).latest("date")
     )
+
     playerTurn = chessboardModelData.playerTurn
     chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
     chessboard.setGameStateId(gameStateId)
@@ -205,10 +214,15 @@ def getAvailableMoves(request):
     position[0] -= 1
     position[1] -= 1
     team = chessboard.board[position[0]][position[1]].getTeam().value
-    moveSet = chessboard.getAllMovesForPosition(team, position)
+
+    movesDict = chessboard.getMovesDictQuery()
+    if not movesDict:
+        movesDict = chessboard.updateMovesDictQuery()
+    
+    moveSet = movesDict[team][tuple(position)]
+
     moveSetList = []
     for move in moveSet:
-        move = list(move)
         for i in range(len(move)):
             move[i] += 1
         moveSetList.append(move)
