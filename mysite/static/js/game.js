@@ -16,9 +16,23 @@ class Game {
   async startGame() {
     // game logic
     var url = "http://127.0.0.1:8000/chess/getData/";
-    const response = await fetch(url);
-    const data = await response.json();
-    this.chessboard.processBoard(data);
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data);
+
+      if(data){
+        this.chessboard.processBoard(data);
+      }else {
+        console.log("Data wasn't valid.")
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
   }
 
   async setupEventListener(event) {

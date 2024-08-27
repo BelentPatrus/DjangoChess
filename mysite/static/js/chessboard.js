@@ -80,11 +80,21 @@ class Chessboard {
                     - moves a chess piece
             */
     var url = processClickUrl;
+    let obj;
 
-    const obj = {
-      cords: JSON.stringify(clicks),
-      gameState: this.gameStateId.toString(),
-    };
+    if (clicks.length === 2) {
+      obj = {
+        position: JSON.stringify(clicks[0]),
+        move: JSON.stringify(clicks[1]),
+        gameState: this.gameStateId.toString(),
+      };
+    } else {
+      obj = {
+        position: JSON.stringify(clicks[0]),
+        gameState: this.gameStateId.toString(),
+      };
+    }
+
     try {
       let response = await fetch(url, {
         method: "POST",
