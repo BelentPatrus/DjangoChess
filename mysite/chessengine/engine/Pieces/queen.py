@@ -75,6 +75,5 @@ class Queen(Piece):
                 break
             i+=1
 
-        print('Moves available for QUEEN at [{},{}]: {}'.format(row,col,moves))
         return moves
         

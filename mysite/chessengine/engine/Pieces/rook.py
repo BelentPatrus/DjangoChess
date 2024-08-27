@@ -44,5 +44,4 @@ class Rook(Piece):
                 break
             i+=1
 
-        print('Moves available for ROOK at [{},{}]: {}'.format(row,col,moves))
         return moves

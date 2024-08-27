@@ -11,6 +11,7 @@ from .engine.chessboard import Chessboard
 from .engine.TeamSideE import TeamSideE
 from .forms import RegisterForm, LoginForm
 from .helper import Helper
+from .datalayer.ChessDB import ChessDB
 import json
 
 
@@ -90,8 +91,7 @@ def twoPointMove(request):
         )
 
         playerTurn = chessboardModelData.playerTurn
-        chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
-        chessboard.setGameStateId(gameStateId)
+        chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn, gameStateId)
         position = json.loads(serializer.validated_data.get("position"))
         move = json.loads(serializer.validated_data.get("move"))
         print(position)
@@ -111,48 +111,6 @@ def twoPointMove(request):
         movePieceResult = chessboard.movePiece(position, move)
 
         if movePieceResult['isValid']:
-
-            validatedData = serializer.validated_data
-            moveData = chessboard.getMoveData()
-            if moveData['result'] == 'CASTLE':
-                # Need to save two moves
-                chessMoveDataKing = ChessMoveModel(
-                    piece=moveData['piece'],
-                    position=moveData['position'],
-                    move=moveData['move'],
-                    pieceTaken=moveData['pieceTaken'],
-                    result=moveData['result'],
-                    gameState=gameStateId
-                )
-                chessMoveDataRook = ChessMoveModel(
-                    piece=moveData['rookPiece'],
-                    position=moveData['rookPosition'],
-                    move=moveData['rookMove'],
-                    pieceTaken=moveData['rookPieceTaken'],
-                    result=moveData['result'],
-                    gameState=gameStateId
-                )
-                chessMoveDataKing.save()
-                chessMoveDataRook.save()
-            else:
-                validatedData.update(moveData)
-                try:
-                    serializer.is_valid()
-                    serializer.save()
-                except Exception:
-                    print(f"serializer didn't save properly: \n{Exception}")
-
-
-            moveDict = Helper.convert_keys_to_strings(chessboard.getAllValidMoves())
-
-            chessboardData = ChessBoardModel(
-                chessboard=json.dumps(chessboard.getJSONDict()),
-                gameState=gameStateId,
-                playerTurn=chessboard.getPlayerTurn(),
-                moveDict=moveDict,
-            )
-            chessboardData.save()
-
             data["sameTeam"] = False
 
     else:
@@ -208,14 +166,13 @@ def getAvailableMoves(request):
     )
 
     playerTurn = chessboardModelData.playerTurn
-    chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn)
-    chessboard.setGameStateId(gameStateId)
+    chessboard = Chessboard(json.loads(chessboardModelData.chessboard), playerTurn, gameStateId)
     position = json.loads(request.data["position"])
     position[0] -= 1
     position[1] -= 1
     team = chessboard.board[position[0]][position[1]].getTeam().value
-
-    movesDict = chessboard.getMovesDictQuery()
+    chessDB = ChessDB(gameStateId)
+    movesDict = chessDB.getMovesDictQuery()
     if not movesDict:
         movesDict = chessboard.updateMovesDictQuery()
     
