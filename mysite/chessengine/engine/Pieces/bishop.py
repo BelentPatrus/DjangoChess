@@ -41,6 +41,5 @@ class Bishop(Piece):
             if not isinstance(board[row+i][col-i], Empty):
                 break
             i+=1
-
-        print('Moves available for BISHOP at [{},{}]: {}'.format(row,col,moves))
+            
         return moves

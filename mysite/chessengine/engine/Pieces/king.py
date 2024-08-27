@@ -42,5 +42,4 @@ class King(Piece):
         if row+1 < 8 and col-1 >=0 and board[row+1][col-1].team.lower() != pieceTeam:
             moves.append([row+1, col-1])
 
-        print('Moves available for KING at [{},{}]: {}'.format(row,col,moves))
         return moves

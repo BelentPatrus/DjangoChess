@@ -46,8 +46,7 @@ class CastlingTestCase(TestCase):
         self.gameStateId = GameStateModel.objects.create()
 
         # Initialize the chessboard
-        self.chess = Chessboard()
-        self.chess.setGameStateId(self.gameStateId)
+        self.chess = Chessboard(gameStateId=self.gameStateId)
 
         # Generate the move dictionary and convert it
         moveDict = self.chess.getAllValidMoves()
@@ -103,26 +102,26 @@ class CastlingTestCase(TestCase):
         position = [0, 4]
         move = [0, 6]
         self.chess.movePiece(position, move) # black right side castle
-        self.assertTrue(self.chess.board[7][6].getType(), King, 
+        self.assertTrue(isinstance(self.chess.board[7][6], King), 
                         f"Position [7,6] doesn't hold a KING piece its: {self.chess.board[7][6]}")
-        self.assertTrue(self.chess.board[7][6].getTeam(), TeamSideE.WHITE, 
+        self.assertEquals(self.chess.board[7][6].getTeam(), TeamSideE.WHITE, 
                         f"Position [7,6] doesn't hold a WHITE piece its: {self.chess.board[7][6]}")
-        self.assertTrue(self.chess.board[7][5].getType(), Rook, 
+        self.assertTrue(isinstance(self.chess.board[7][5], Rook), 
                         f"Position [7,5] doesn't hold a ROOK piece its: {self.chess.board[7][5]}")
-        self.assertTrue(self.chess.board[7][5].getTeam(), TeamSideE.WHITE, 
+        self.assertEquals(self.chess.board[7][5].getTeam(), TeamSideE.WHITE, 
                         f"Position [7,5] doesn't hold a WHITE piece its: {self.chess.board[7][5]}")
         print("White right castle asserted True")
-        self.assertTrue(self.chess.board[0][6].getType(), King, 
+        self.assertTrue(isinstance(self.chess.board[0][6], King),
                         f"Position [0,6] doesn't hold a KING piece its: {self.chess.board[0][6]}")
-        self.assertTrue(self.chess.board[0][6].getTeam(), TeamSideE.BLACK, 
+        self.assertEquals(self.chess.board[0][6].getTeam(), TeamSideE.BLACK,
                         f"Position [0,6] doesn't hold a BLACK piece its: {self.chess.board[0][6]}")
-        self.assertTrue(self.chess.board[0][5].getType(), Rook, 
+        self.assertTrue(isinstance(self.chess.board[0][5], Rook), 
                         f"Position [0,5] doesn't hold a ROOK piece its: {self.chess.board[0][5]}")
-        self.assertTrue(self.chess.board[0][5].getTeam(), TeamSideE.BLACK, 
+        self.assertEquals(self.chess.board[0][5].getTeam(), TeamSideE.BLACK, 
                         f"Position [0,5] doesn't hold a BLACK piece its: {self.chess.board[0][5]}")
         print("Black right castle asserted True")
 
-    def testValidCastlingLeft(self):
+    def test_valid_castling_left(self):
         print("Start of Test Case 01: Valid Castling")
 
         self.performMoves()
@@ -157,21 +156,21 @@ class CastlingTestCase(TestCase):
         position = [0, 4]
         move = [0, 2]
         self.chess.movePiece(position, move) # black left side castle
-        self.assertTrue(self.chess.board[7][2].getType(), King, 
+        self.assertTrue(isinstance(self.chess.board[7][2], King), 
                         f"Position [7,2] doesn't hold a KING piece its: {self.chess.board[7][2]}")
-        self.assertTrue(self.chess.board[7][2].getTeam(), TeamSideE.WHITE, 
+        self.assertEquals(self.chess.board[7][2].getTeam(), TeamSideE.WHITE, 
                         f"Position [7,2] doesn't hold a WHITE piece its: {self.chess.board[7][2]}")
-        self.assertTrue(self.chess.board[7][3].getType(), Rook, 
+        self.assertTrue(isinstance(self.chess.board[7][3], Rook), 
                         f"Position [7,3] doesn't hold a ROOK piece its: {self.chess.board[7][3]}")
-        self.assertTrue(self.chess.board[7][3].getTeam(), TeamSideE.WHITE, 
+        self.assertEquals(self.chess.board[7][3].getTeam(), TeamSideE.WHITE, 
                         f"Position [7,3] doesn't hold a WHITE piece its: {self.chess.board[7][3]}")
         print("White LEFT castle asserted True")
-        self.assertTrue(self.chess.board[0][2].getType(), King, 
+        self.assertTrue(isinstance(self.chess.board[0][2], King), 
                         f"Position [0,2] doesn't hold a KING piece its: {self.chess.board[0][2]}")
-        self.assertTrue(self.chess.board[0][2].getTeam(), TeamSideE.BLACK, 
+        self.assertEquals(self.chess.board[0][2].getTeam(), TeamSideE.BLACK, 
                         f"Position [0,6] doesn't hold a BLACK piece its: {self.chess.board[0][2]}")
-        self.assertTrue(self.chess.board[0][3].getType(), Rook, 
+        self.assertTrue(isinstance(self.chess.board[0][3], Rook), 
                         f"Position [0,3] doesn't hold a ROOK piece its: {self.chess.board[0][3]}")
-        self.assertTrue(self.chess.board[0][3].getTeam(), TeamSideE.BLACK, 
+        self.assertEquals(self.chess.board[0][3].getTeam(), TeamSideE.BLACK, 
                         f"Position [0,3] doesn't hold a BLACK piece its: {self.chess.board[0][3]}")
         print("Black LEFT castle asserted True")

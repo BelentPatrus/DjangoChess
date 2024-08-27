@@ -33,6 +33,5 @@ class Pawn(Piece):
                 moves.append([row+1, col-1])
             if row+1 < 8 and col+1 < 8 and board[row+1][col+1].team.lower() == TeamSideE.WHITE.lower():
                 moves.append([row+1, col+1])
-
-        print('Moves available for {} PAWN at [{},{}]: {}'.format(pieceTeam,row,col,moves))
+                
         return moves

@@ -14,6 +14,7 @@ from ..models import ChessBoardModel
 from ..models import ChessMoveModel
 from .Pieces.piece import Piece
 from ..helper import Helper
+from ..datalayer.ChessDB import ChessDB
 
 from django.db.models import Q
 from copy import deepcopy
@@ -30,7 +31,8 @@ class Chessboard:
             index = index + row
         return result
 
-    def __init__(self, chessBoardModel=None, playerTurn=TeamSideE.WHITE):
+    def __init__(self, chessBoardModel=None, playerTurn=TeamSideE.WHITE, gameStateId=None):
+        self.chessDB = ChessDB(gameStateId)
         if chessBoardModel == None:
 
             self.board = [
@@ -49,7 +51,7 @@ class Chessboard:
             self.moveData = {}
             self.moveDict = {}
             self.playerTurn = playerTurn
-            self.gameStateId = None
+            self.gameStateId = gameStateId
         else:
             self.board = []
             for p in chessBoardModel:
@@ -77,6 +79,7 @@ class Chessboard:
             self.moveData = []  # come back and fix this must query db
             self.captureLog = []  # come back and fix this must query db
             self.playerTurn = playerTurn
+            self.gameStateId = gameStateId
 
     def movePiece(self, position, move):
         """
@@ -97,8 +100,7 @@ class Chessboard:
         print(self.board[row][col].getTeam().value)
         print(self.board[row][col].getType().value)
         posTuple = tuple(position)
-
-        moveDict = self.getMovesDictQuery()
+        moveDict = self.chessDB.getMovesDictQuery()
         result['isValid'] = move in moveDict[selectedP.getTeam().value][posTuple]
         if result['isValid']:
 
@@ -113,19 +115,23 @@ class Chessboard:
 
             # left or right castle moves from King
             if isinstance(selectedP, King) and row == nextRow and (col+2 == nextCol or col-2 == nextCol):
-                moveData['result'] = 'CASTLE'
-                moveData['rookPosition'] = [row,0] if col - 2 == nextCol else [row,7]
-                moveData['rookMove'] = [row,3] if col - 2 == nextCol else [row,5]
 
-                moveData['rookPiece'] = {
-                                        'team': self.board[moveData['rookPosition'][0]][moveData['rookPosition'][1]].getTeam().value, 
-                                        'type': self.board[moveData['rookPosition'][0]][moveData['rookPosition'][1]].getType().value
+                moveDataRook = {}
+                moveDataRook['result'], moveData['result'] = "CASTLE", "CASTLE"
+
+                moveDataRook['position'] = [row,0] if col - 2 == nextCol else [row,7]
+                moveDataRook['move'] = [row,3] if col - 2 == nextCol else [row,5]
+
+                moveDataRook['piece'] = {
+                                        'team': self.board[moveDataRook['position'][0]][moveDataRook['position'][1]].getTeam().value, 
+                                        'type': self.board[moveDataRook['position'][0]][moveDataRook['position'][1]].getType().value
                                         }
-                moveData['rookPieceTaken'] = {
-                                            'team': self.board[moveData['rookMove'][0]][moveData['rookMove'][1]].getTeam().value, 
-                                            'type': self.board[moveData['rookMove'][0]][moveData['rookMove'][1]].getType().value
+                moveDataRook['pieceTaken'] = {
+                                            'team': self.board[moveDataRook['move'][0]][moveDataRook['move'][1]].getTeam().value, 
+                                            'type': self.board[moveDataRook['move'][0]][moveDataRook['move'][1]].getType().value
                                             }
-                self.castle(position, move, moveData['rookPosition'], moveData['rookMove'])
+                self.castle(position, move, moveDataRook['position'], moveDataRook['move'])
+                self.chessDB.insertChessMoveModel(moveDataRook)
             elif isinstance(selectedP, Pawn) and pieceTaken.getTeam() == TeamSideE.EMPTY and col != nextCol:
                 moveData['result'] = 'EN PASSANT'
                 self.enPassant(position, move)
@@ -137,8 +143,9 @@ class Chessboard:
                 self.moveOrTake(position,move)
 
             self.setMoveData(moveData)
-
             self.toggleTurn()
+            self.chessDB.insertChessMoveModel(moveData)
+            self.chessDB.insertChessboardModel(self.getJSONDict(), self.getAllValidMoves(), self.getPlayerTurn())
             # result['moveDict'] = Helper.convert_keys_to_strings(self.getAllValidMoves())
             print(f"Move piece data: \n{moveData}")
 
@@ -171,10 +178,8 @@ class Chessboard:
         for row, rowArray in enumerate(self.board):
             for col, piece in enumerate(rowArray):
                 if piece.team != TeamSideE.EMPTY:
-                    print(f'Valid Moves: Piece - {piece} position ({row}, {col})')
                     position = (row,col)
                     valid_moves[piece.team.value][position] = self.getMovesFilter(piece, position)
-                    print(f'Valid Moves generated for {piece} - {valid_moves[piece.team][position]}')
         print(f'End of Valid Moves result: \n{valid_moves}')
 
         return valid_moves
@@ -206,8 +211,8 @@ class Chessboard:
         return moves
 
     def handleCastling(self, piece, moves, position):
-        hasKingMoved = self.getKingsFirstMoveQuery(piece.getTeam())
-        hasLeftRookMoved, hasRightRookMoved = self.getRooksFirstMoveQuery(piece.getTeam())
+        hasKingMoved = self.chessDB.getKingsFirstMoveQuery(piece.getTeam())
+        hasLeftRookMoved, hasRightRookMoved = self.chessDB.getRooksFirstMoveQuery(piece.getTeam())
         leftCastle = False
         rightCastle = False
         # Need to test out the moveset filter.
@@ -234,17 +239,17 @@ class Chessboard:
         if leftCastle:
             if piece.getTeam() == TeamSideE.WHITE:
                 if isinstance(piece, King):
-                    moves.append((7,2))
+                    moves.append([7,2])
             elif piece.getTeam() == TeamSideE.BLACK:
                 if isinstance(piece, King):
-                    moves.append((0,2))
+                    moves.append([0,2])
         if rightCastle:
             if piece.getTeam() == TeamSideE.WHITE:
                 if isinstance(piece, King):
-                    moves.append((7,6))
+                    moves.append([7,6])
             if piece.getTeam() == TeamSideE.BLACK:
                 if isinstance(piece, King):
-                    moves.append((0,6))
+                    moves.append([0,6])
 
         return moves
 
@@ -252,11 +257,11 @@ class Chessboard:
         isUnderAttackRight = False
         isUnderAttackLeft = False
 
-        positionsRight = [(0,6),(0,5)]
-        positionsLeft = [(0,3),(0,2)]
+        positionsRight = [[0,6],[0,5]]
+        positionsLeft = [[0,3],[0,2]]
         if player == TeamSideE.WHITE:
-            positionsRight = [(7, 6), (7, 5)] 
-            positionsLeft = [(7, 3), (7, 2)]
+            positionsRight = [[7, 6], [7, 5]] 
+            positionsLeft = [[7, 3], [7, 2]]
 
         for row, rowArray in enumerate(self.board):
             for col, piece in enumerate(rowArray):
@@ -273,82 +278,13 @@ class Chessboard:
 
         return isUnderAttackLeft, isUnderAttackRight
 
-    def getKingsFirstMoveQuery(self, team):
-
-        position = [0,4]
-        if team == TeamSideE.WHITE:
-            position = [7,4]
-        try:
-            kingMoves = ChessMoveModel.objects.filter(
-                gameState=self.gameStateId,
-                piece__type=Pieces.KING.value,
-                piece__team=team,
-                position=position
-            ).order_by("date")
-        except ChessMoveModel.DoesNotExist:
-            kingMoves = None
-
-        return kingMoves
-
-    def getMovesDictQuery(self):
-        try:
-            movesDict = ChessBoardModel.objects.filter(
-                gameState=self.gameStateId,
-            ).values('moveDict').latest('date')
-            movesDict = Helper.convert_keys_to_tuples(movesDict['moveDict'])
-        except ChessBoardModel.DoesNotExist:
-            movesDict = None
-
-        return movesDict
-
-    def updateMovesDictQuery(self):
-        movesDict = self.getAllValidMoves()
-        moveDictConverted = Helper.convert_keys_to_strings(movesDict)
-        result = json.dumps(self.getJSONDict())
-        chessboardData = ChessBoardModel(
-            chessboard=result,
-            moveDict=moveDictConverted,
-            gameState=self.getGameStateId(),
-            playerTurn=self.getPlayerTurn(),
-        )
-        chessboardData.save()
-        return movesDict
-
-    def getRooksFirstMoveQuery(self, team):
-        position1 = [7,0]
-        position2 = [7,7]
-        if team == TeamSideE.WHITE:
-            position1 = [0,0]
-            position2 = [0,7]
-        try:
-            firstMovePos1 = ChessMoveModel.objects.filter(
-                Q(gameState=self.gameStateId) &
-                Q(piece__type=Pieces.ROOK.value) &
-                Q(piece__team=team) &
-                Q(position=position1)
-            ).earliest("date")
-        except ChessMoveModel.DoesNotExist:
-            firstMovePos1 = None
-
-        try:
-            firstMovePos2 = ChessMoveModel.objects.filter(
-                Q(gameState=self.gameStateId) &
-                Q(piece__type=Pieces.ROOK.value) &
-                Q(piece__team=team) &
-                Q(position=position2)
-            ).earliest("date")
-        except ChessMoveModel.DoesNotExist:
-            firstMovePos2 = None
-
-        return firstMovePos1, firstMovePos2
-
     def handleEnPassant(self, piece, moves, position):
         rowCheck = 4
         if piece.getTeam() == TeamSideE.WHITE:
             rowCheck = 3
         if position[0] != rowCheck:
             return moves
-        
+
         checkRight = False
         if position[1] < 7:
             rightPiece = self.board[position[0]][position[1] + 1]
@@ -363,7 +299,7 @@ class Chessboard:
                 latestMove = self.getMoveData()['move']
                 if latestMove == [position[0], position[1] - 1]:
                     checkLeft = True
-        
+
         if checkRight:
             if piece.getTeam() == TeamSideE.BLACK:
                 moves.append((position[0] + 1, position[1] + 1)) # down and left in white perspective
@@ -376,16 +312,6 @@ class Chessboard:
                 moves.append((position[0] - 1, position[1] - 1)) # up and left in white perspective
 
         return moves
-
-    def getLatestMoveQuery(self):
-        try:
-            latestMove= ChessMoveModel.objects.filter(
-                gameState=self.getGameStateId()
-            ).earliest("date")
-        except ChessMoveModel.DoesNotExist:
-            latestMove = None
-        
-        return latestMove
 
     def simulateMove(self, move, position):
 
